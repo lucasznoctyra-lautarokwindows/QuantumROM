@@ -201,7 +201,7 @@ DOWNLOAD_FIRMWARE() {
 
     find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
     # --- Show Firmware Info ---
-    local file_size=$(du -m FW/${MODEL}_*_fac.zip 2>/dev/null | cut -f1)
+    local file_size=$(du -m "${DOWN_DIR}"/${MODEL}_*_fac.zip 2>/dev/null | cut -f1)
     echo -e "Firmware Size: ${file_size} MB"
 }
 
