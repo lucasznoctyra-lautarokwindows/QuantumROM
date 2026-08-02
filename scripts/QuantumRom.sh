@@ -1792,15 +1792,6 @@ APPLY_STOCK_CONFIG() {
         return 1
     fi
 
-    if GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist" >/dev/null 2>&1; then
-        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist")"
-    elif GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist" >/dev/null 2>&1; then
-        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist")"
-    else
-        echo "- CPU abilist property not found!"
-        return 1
-    fi
-
 	if [ -z "$STOCK_DEVICE" ] || [ "$STOCK_DEVICE" = "None" ]; then
         echo -e "No target device is set. Just modifying ROM without any device config."
         return 1
