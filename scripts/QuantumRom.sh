@@ -163,6 +163,7 @@ DOWNLOAD_FIRMWARE() {
     local CSC="$2"
     local IMEI="$3"
     local DOWN_DIR="${4}/$MODEL"
+	local CUSTOM_VERSION="$5" 
 
     rm -rf "$DOWN_DIR"
     mkdir -p "$DOWN_DIR"
@@ -185,9 +186,9 @@ DOWNLOAD_FIRMWARE() {
     fi
 
     # --- Step 2: Download Firmware ---
-    python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -O "$DOWN_DIR"
+    python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -v "$VERSION" -O "$DOWN_DIR"
     if [ $? -ne 0 ]; then
-        echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC."
+        echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC/VERSION."
         exit 1
     fi
 
