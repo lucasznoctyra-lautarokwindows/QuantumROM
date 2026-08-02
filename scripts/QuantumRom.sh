@@ -173,6 +173,11 @@ DOWNLOAD_FIRMWARE() {
     echo -e "======================================"
     echo -e "MODEL: $MODEL | CSC: $CSC"
 
+    if [ -n "$CUSTOM_VERSION" ]; then
+        echo -e "📌 Using custom requested version: $CUSTOM_VERSION"
+        VERSION="$CUSTOM_VERSION"
+    else
+        echo -e "🔍 Checking for latest update..."
     VERSION=$(python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" checkupdate 2>&1)
 
     if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
