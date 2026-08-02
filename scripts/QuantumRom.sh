@@ -155,7 +155,7 @@ DOWNLOAD_FIRMWARE() {
     echo " "
 
     if [ "$#" -lt 4 ]; then
-        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <IMEI> <DOWNLOAD_DIRECTORY> [VERSION]"
+        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <IMEI> <FW> [VERSION]"
         return 1
     fi
 
