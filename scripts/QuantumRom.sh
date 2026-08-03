@@ -169,7 +169,7 @@ DOWNLOAD_FIRMWARE() {
     mkdir -p "$DOWN_DIR"
 
     echo -e "======================================"
-    echo -e "  Samsung FW Downloader   "
+    echo -e "   Samsung FW Downloader    "
     echo -e "======================================"
     echo -e "MODEL: $MODEL | CSC: $CSC"
 
@@ -182,44 +182,53 @@ DOWNLOAD_FIRMWARE() {
 
         echo -e "📥 Downloading $FILE_NAME to $DOWN_DIR..."
         
-    if command -v aria2c >/dev/null 2>&1; then
-        aria2c -x 16 -s 16 -k 1M -d "$DOWN_DIR" -o "$FILE_NAME" "$CUSTOM_URL"
-    elif command -v wget >/dev/null 2>&1; then
-        wget --no-check-certificate -c "$CUSTOM_URL" -O "$DOWN_DIR/$FILE_NAME"
-    else
-        curl -L -k -C - "$CUSTOM_URL" -o "$DOWN_DIR/$FILE_NAME"
-    fi
+        if command -v aria2c >/dev/null 2>&1; then
+            aria2c -x 16 -s 16 -k 1M -d "$DOWN_DIR" -o "$FILE_NAME" "$CUSTOM_URL"
+        elif command -v wget >/dev/null 2>&1; then
+            wget --no-check-certificate -c "$CUSTOM_URL" -O "$DOWN_DIR/$FILE_NAME"
+        else
+            curl -L -k -C - "$CUSTOM_URL" -o "$DOWN_DIR/$FILE_NAME"
+        fi
 
-    else
-    if [ -n "$CUSTOM_VERSION" ]; then
-        echo -e "📌 Using custom requested version: $CUSTOM_VERSION"
-        VERSION="$CUSTOM_VERSION"
-    else
-        echo -e "🔍 Checking for latest update..."
-        VERSION=$(python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" checkupdate 2>&1)
-
-        if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
-            echo -e "⛔️ MODEL/CSC/IMEI not valid or no update found."
-            echo -e "Error: $VERSION"
+        if [ $? -ne 0 ]; then
+            echo -e "⛔️ Direct download failed. Please check your URL."
             return 1
         fi
+    else
+        if [ -n "$CUSTOM_VERSION" ]; then
+            echo -e "📌 Using custom requested version: $CUSTOM_VERSION"
+            VERSION="$CUSTOM_VERSION"
+        else
+            echo -e "🔍 Checking for latest update..."
+            VERSION=$(python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" checkupdate 2>&1)
+
+            if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
+                echo -e "⛔️ MODEL/CSC/IMEI not valid or no update found."
+                echo -e "Error: $VERSION"
+                return 1
+            fi
+        fi
+
+        if [ -n "$GITHUB_ENV" ]; then
+            echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+        fi
+
+        # --- Step 2: Download Firmware ---
+        python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -v "$VERSION" -O "$DOWN_DIR"
+        if [ $? -ne 0 ]; then
+            echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC/VERSION."
+            return 1
+        fi
+
+        find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
     fi
 
-    if [ -n "$GITHUB_ENV" ]; then
-        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-    fi
-
-    # --- Step 2: Download Firmware ---
-    python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -v "$VERSION" -O "$DOWN_DIR"
-    if [ $? -ne 0 ]; then
-        echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC/VERSION."
-        exit 1
-    fi
-
-    find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
     # --- Show Firmware Info ---
-    local file_size=$(du -m "${DOWN_DIR}"/${MODEL}_*_fac.zip 2>/dev/null | cut -f1)
-    echo -e "Firmware Size: ${file_size} MB"
+    local file_size
+    file_size=$(du -sh "$DOWN_DIR" 2>/dev/null | cut -f1)
+    echo -e "✅ Download completed!"
+    echo -e "Firmware Directory Size: ${file_size}"
+}
 
 EXTRACT_FIRMWARE() {
     echo " "
