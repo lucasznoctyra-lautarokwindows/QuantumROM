@@ -173,7 +173,26 @@ DOWNLOAD_FIRMWARE() {
     echo -e "======================================"
     echo -e "MODEL: $MODEL | CSC: $CSC"
 
- 
+    if [ -n "$CUSTOM_URL" ]; then
+        echo -e "📌 Using custom direct download URL: $CUSTOM_URL"
+        
+        local FILE_NAME
+        FILE_NAME=$(basename "$CUSTOM_URL" | cut -d'?' -f1)
+        [ -z "$FILE_NAME" ] && FILE_NAME="firmware.zip"
+
+        local TARGET_PATH="$DOWN_DIR/$FILE_NAME"
+        echo -e "📥 Downloading direct link to $DOWN_DIR..."
+
+        if command -v aria2c >/dev/null 2>&1; then
+            aria2c -x 16 -s 16 -k 1M -d "$DOWN_DIR" -o "$FILE_NAME" "$CUSTOM_URL"
+        elif command -v wget >/dev/null 2>&1; then
+            wget --no-check-certificate -c "$CUSTOM_URL" -O "$TARGET_PATH"
+        else
+            curl -L -k -C - "$CUSTOM_URL" -o "$TARGET_PATH"
+        fi
+
+    else
+
     if [ -n "$CUSTOM_VERSION" ]; then
         echo -e "📌 Using custom requested version: $CUSTOM_VERSION"
         VERSION="$CUSTOM_VERSION"
