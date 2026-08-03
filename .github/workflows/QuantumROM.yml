@@ -7,6 +7,10 @@ on:
         description: "STOCK_DEVICE_MODEL or None"
         required: true
         default: "SM-A225F"
+      custom_url:
+        description: 'Direct Download Link (Optional - Leave blank for SamFW)'
+        required: false
+        default: ''
       TARGET_FW_VERSION:
         description: "Any specific firmware release version."
         required: false
@@ -74,8 +78,8 @@ jobs:
       - name: Download firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
         run: |
          source scripts/QuantumRom.sh
-         DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" "FIRMWARE" "${{ github.event.inputs.TARGET_FW_VERSION }}"
-
+         CUSTOM_URL="${{ github.event.inputs.custom_url }}" DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" "FIRMWARE" "${{ github.event.inputs.TARGET_FW_VERSION }}"
+     
       - name: Extract firmware
         run: |
           source scripts/QuantumRom.sh
