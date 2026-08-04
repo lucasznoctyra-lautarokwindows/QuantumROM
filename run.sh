@@ -40,7 +40,7 @@ fi
 if [ ! -f "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip" ]; then
     if curl -fsSL --connect-timeout 5 https://www.google.com >/dev/null; then
         wget --no-check-certificate \
-            "https://github.com/SN-Abdullah-Al-Noman/QuantumROM/releases/download/QuantumROM_Devices/${STOCK_DEVICE}.zip" \
+            "https://github.com/lucasznoctyra-lautarokwindows/QuantumROM/releases/download/Nupid_Stiggers/${STOCK_DEVICE}.zip" \
             -O "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip"
     else
 	    rm -rf "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip"
