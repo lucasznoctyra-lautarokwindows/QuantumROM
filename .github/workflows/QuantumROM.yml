@@ -1,4 +1,4 @@
-name: QuantumROM Tools.
+name: BethanyROM tools
 
 on:
   workflow_dispatch:
@@ -42,7 +42,7 @@ on:
 
 jobs:
   build:
-    name: Start QuantumROM Tools Sixteen.
+    name: Run BethanyROM tools
     runs-on: ubuntu-24.04
 
     steps:
@@ -57,9 +57,9 @@ jobs:
                   "https://api.github.com/repos/lucasznoctyra-lautarokwindows/QuantumROM/releases/tags/Nupid_Stiggers" |
                   jq -e --arg dev "${STOCK_DEVICE}.zip" '.assets[].name == $dev' |
                   grep -q true; then
-                  echo "$STOCK_DEVICE is supported"
+                  echo "Bethany won't eat your phone"
               else
-                 echo "❌ $STOCK_DEVICE is not supported by this tool."
+                 echo "❌ Bethany ate your phone"
                  exit 1
               fi
           fi
@@ -75,7 +75,7 @@ jobs:
           sudo pip3 install git+https://github.com/SN-Abdullah-Al-Noman/samloader.git --break-system-packages
           mkdir -p FW WORK OUT
 
-      - name: Download firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
+      - name: Download Bethany firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
         run: |
          source scripts/QuantumRom.sh
          CUSTOM_URL="${{ github.event.inputs.custom_url }}" DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" "FIRMWARE" "${{ github.event.inputs.TARGET_FW_VERSION }}"
@@ -85,7 +85,7 @@ jobs:
           source scripts/QuantumRom.sh
           EXTRACT_FIRMWARE "FW/${{ github.event.inputs.TARGET_DEVICE }}"
 
-      - name: Start Rom Build For ${{ github.event.inputs.STOCK_DEVICE }}
+      - name: Start Build BethanyROM For ${{ github.event.inputs.STOCK_DEVICE }}
         run: |
           sudo bash run.sh \
             "${{ github.event.inputs.STOCK_DEVICE }}" \
@@ -95,7 +95,7 @@ jobs:
             "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" \
             "${{ github.event.inputs.OUTPUT_FILESYSTEM }}"
 
-      - name: Compress all .img & make zip file before upload.
+      - name: Compress BethanyROM all .img & make zip file before upload.
         run: |
           echo "BUILD_TIME=$(TZ='Asia/Dhaka' date '+%Y-%m-%d %I:%M:%S %p UTC+6')" >> $GITHUB_ENV
           OUT_DIR="$(pwd)/OUT"
@@ -116,7 +116,7 @@ jobs:
           7z a -tzip "$ZIP_PATH" "$OUT_DIR"/* -mx=5
           echo "ZIP_PATH=$ZIP_PATH" >> $GITHUB_ENV
 
-      - name: Upload file in GoFile & Create Release.
+      - name: Upload BethanyROM in GoFile & Create Release.
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
           STOCK_DEVICE: ${{ github.event.inputs.STOCK_DEVICE }}
