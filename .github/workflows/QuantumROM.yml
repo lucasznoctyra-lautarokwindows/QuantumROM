@@ -1,4 +1,4 @@
-name: BethanyROM tools
+name: QuantumROM Tools.
 
 on:
   workflow_dispatch:
@@ -7,14 +7,6 @@ on:
         description: "STOCK_DEVICE_MODEL or None"
         required: true
         default: "SM-A225F"
-      custom_url:
-        description: 'Direct Download Link (Optional - Leave blank for SamFW)'
-        required: false
-        default: ''
-      TARGET_FW_VERSION:
-        description: "Any specific firmware release version."
-        required: false
-        default: ""
       USE_UI_8_TETHERING_APEX:
         description: "Set True if your kernel BPF version is 5.4 (lower than 5.10)."
         required: true
@@ -27,10 +19,9 @@ on:
         description: "TARGET_DEVICE_CSC."
         required: true
         default: "BKD"
-      TARGET_DEVICE_IMEI:
-        description: "TARGET_DEVICE_IMEI."
-        required: true
-        default: "353435774197736"
+      TARGET_FW_VERSION:
+        description: "Specific Samsung firmware version (PDA/CSC/MODEM) OR (AP/CSC/CP)"
+        required: false
       OUTPUT_FILESYSTEM:
         description: "OUTPUT_FILESYSTEM. e.g erofs / ext4 / f2fs"
         required: true
@@ -42,60 +33,57 @@ on:
 
 jobs:
   build:
-    name: Run BethanyROM tools
+    name: Start QuantumROM Tools Sixteen.
     runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout repository.
         uses: actions/checkout@v4
 
-      - name: Bethany sniffing your phone
+      - name: Validate STOCK_DEVICE
         run: |
           STOCK_DEVICE="${{ github.event.inputs.STOCK_DEVICE }}"
           if [ "$STOCK_DEVICE" != "None" ]; then
               if curl -fsSL \
-                  "https://api.github.com/repos/lucasznoctyra-lautarokwindows/QuantumROM/releases/tags/Nupid_Stiggers" |
+                  "https://api.github.com/repos/SN-Abdullah-Al-Noman/QuantumROM/releases/tags/QuantumROM_Devices" |
                   jq -e --arg dev "${STOCK_DEVICE}.zip" '.assets[].name == $dev' |
                   grep -q true; then
-                  echo "Bethany won't eat your phone"
+                  echo "$STOCK_DEVICE is supported"
               else
-                 echo "❌ Bethany ate your phone"
+                 echo "❌ $STOCK_DEVICE is not supported by this tool."
                  exit 1
               fi
           fi
 
-      - name: Remove Bethany for less size 
+      - name: Remove unnecessary files.
         uses: rokibhasansagar/slimhub_actions@v25.42.5
 
-      - name: Calling Bethany
+      - name: Install Dependencies.
         run: |
           sudo apt update
           sudo apt install -y p7zip-full lz4 liblz4-1 liblz4-dev libzstd1 libzstd-dev build-essential android-sdk-libsparse-utils f2fs-tools fuse2fs fuse e2fsprogs python3 python3-pip zipalign unzip openjdk-21-jdk jq perl xxd kmod erofs-utils curl wget linux-modules-extra-$(uname -r)
           sudo modprobe f2fs
-          sudo pip3 install git+https://github.com/SN-Abdullah-Al-Noman/samloader.git --break-system-packages
           mkdir -p FW WORK OUT
 
-      - name: Download Bethany firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
+      - name: Download firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
         run: |
-         source scripts/QuantumRom.sh
-         CUSTOM_URL="${{ github.event.inputs.custom_url }}" DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" "FIRMWARE" "${{ github.event.inputs.TARGET_FW_VERSION }}"
-     
-      - name: Extract Bethany
+          source scripts/QuantumRom.sh
+          DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "FW" "${{ github.event.inputs.TARGET_FW_VERSION }}"
+
+      - name: Extract firmware
         run: |
           source scripts/QuantumRom.sh
           EXTRACT_FIRMWARE "FW/${{ github.event.inputs.TARGET_DEVICE }}"
 
-      - name: Start Build BethanyROM For ${{ github.event.inputs.STOCK_DEVICE }}
+      - name: Start Rom Build For ${{ github.event.inputs.STOCK_DEVICE }}
         run: |
           sudo bash run.sh \
             "${{ github.event.inputs.STOCK_DEVICE }}" \
-            "${{ github.event.inputs.USE_UI_8_TETHERING_APEX }}" \
             "${{ github.event.inputs.TARGET_DEVICE }}" \
-            "${{ github.event.inputs.TARGET_DEVICE_CSC }}" \
-            "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" \
+            "${{ github.event.inputs.USE_UI_8_TETHERING_APEX }}" \
             "${{ github.event.inputs.OUTPUT_FILESYSTEM }}"
 
-      - name: Compress BethanyROM all .img & make zip file before upload.
+      - name: Compress all .img & make zip file before upload.
         run: |
           echo "BUILD_TIME=$(TZ='Asia/Dhaka' date '+%Y-%m-%d %I:%M:%S %p UTC+6')" >> $GITHUB_ENV
           OUT_DIR="$(pwd)/OUT"
@@ -116,7 +104,7 @@ jobs:
           7z a -tzip "$ZIP_PATH" "$OUT_DIR"/* -mx=5
           echo "ZIP_PATH=$ZIP_PATH" >> $GITHUB_ENV
 
-      - name: Upload BethanyROM in GoFile & Create Release.
+      - name: Upload file in GoFile & Create Release.
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
           STOCK_DEVICE: ${{ github.event.inputs.STOCK_DEVICE }}
