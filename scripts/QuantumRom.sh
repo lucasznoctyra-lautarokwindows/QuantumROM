@@ -1805,15 +1805,6 @@ APPLY_STOCK_CONFIG() {
         return 1
     fi
 
-    if GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist" >/dev/null 2>&1; then
-        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist")"
-    elif GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist" >/dev/null 2>&1; then
-        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist")"
-    else
-        echo "- CPU abilist property not found!"
-        return 1
-    fi
-
 	if [ -z "$STOCK_DEVICE" ] || [ "$STOCK_DEVICE" = "None" ]; then
         echo -e "No target device is set. Just modifying ROM without any device config."
         return 1
@@ -1833,7 +1824,6 @@ APPLY_STOCK_CONFIG() {
         echo -e "$STOCK_DEVICE config found."
         local STOCK_VNDK_VERSION="$(grep -m1 '^STOCK_VNDK_VERSION=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
         local STOCK_HAS_SEPARATE_SYSTEM_EXT="$(grep -m1 '^STOCK_HAS_SEPARATE_SYSTEM_EXT=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
-		local STOCK_DEVICE_CPU_ABILIST="$(grep -m1 '^STOCK_DEVICE_CPU_ABILIST=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local STOCK_DEVICE_CHIPSET="$(grep -m1 '^STOCK_DEVICE_CHIPSET=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local USE_ALT_SDHMS_APP="$(grep -m1 '^USE_ALT_SDHMS_APP=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local STOCK_HAS_ESIM_SUPPORT="$(grep -m1 '^STOCK_HAS_ESIM_SUPPORT=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
@@ -1848,13 +1838,6 @@ APPLY_STOCK_CONFIG() {
 	if [ ! -f "$STOCK_ROM_FLOATING_FEATURE" ]; then
         echo "- File not found: STOCK_ROM_FLOATING_FEATURE"
         return 1
-    fi
-
-	if [ "$STOCK_DEVICE_CPU_ABILIST" != "$TARGET_ROM_CPU_ABILIST" ]; then
-        echo "CPU ABI MISMATCH!"
-        echo "STOCK DEVICE CPU ABI: $STOCK_DEVICE_CPU_ABILIST"
-        echo "TARGET ROM CPU ABI  : $TARGET_ROM_CPU_ABILIST"
-        exit 1
     fi
 
     # Remove ESIM files if stock device does not support.
