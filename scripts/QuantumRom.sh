@@ -11,6 +11,7 @@ QT_DIR="$(pwd)"
 export lpmake="$QT_DIR/bin/lp/lpmake"
 export lpunpack="$QT_DIR/bin/lp/lpunpack"
 export make_ext4fs="$QT_DIR/bin/ext4/make_ext4fs"
+export samloader="$QT_DIR/bin/samloader/samloader"
 export make_f2fs="$QT_DIR/bin/f2fs-tools/mkfs.f2fs"
 export sload_f2fs="$QT_DIR/bin/f2fs-tools/sload.f2fs"
 export omc_decoder="$QT_DIR/bin/java/omc-decoder.jar"
@@ -20,11 +21,63 @@ export imgextractor_py="$QT_DIR/bin/py_scripts/imgextractor.py"
 
 chmod +x "$lpmake"
 chmod +x "$lpunpack"
+chmod +x "$samloader"
 chmod +x "$make_f2fs"
 chmod +x "$sload_f2fs"
 chmod +x "$mkfs_erofs"
 chmod +x "$make_ext4fs"
 chmod +x "$extract_erofs"
+
+
+DOWNLOAD_FIRMWARE() {
+    echo " "
+
+    if [ "$#" -lt 3 ]; then
+        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <DOWNLOAD_DIRECTORY> [VERSION]"
+        return 1
+    fi
+
+    local MODEL="$1"
+    local CSC="$2"
+    local DOWN_DIR="${3}/$MODEL"
+	local VERSION="${4:-}"
+
+    rm -rf "$DOWN_DIR"
+    mkdir -p "$DOWN_DIR"
+
+    echo -e "======================================"
+    echo -e "  Samsung FW Downloader   "
+    echo -e "======================================"
+    echo -e "MODEL: $MODEL | CSC: $CSC"
+
+    # Check version
+	if [ -z "$VERSION" ]; then
+        VERSION=$($samloader check-update --model "$MODEL" --region "$CSC")
+
+        if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
+            echo "⛔️ MODEL/CSC not valid or no update found."
+            exit 1
+        fi
+    fi
+
+    if [ -n "$GITHUB_ENV" ]; then
+        echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+    fi
+
+    # Download Firmware
+	local VERSION_FILE="${VERSION//\//_}"
+    $samloader download --model "$MODEL" --region "$CSC" --version "$VERSION" --out-file "$DOWN_DIR/${VERSION_FILE}.zip"
+    if [ $? -ne 0 ]; then
+        echo -e "⛔️ Download failed. Check MODEL/CSC."
+        exit 1
+    fi
+
+	find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
+
+    # Show Firmware Info
+    local file_size=$(du -m "${DOWN_DIR}/${VERSION}.zip" 2>/dev/null | awk '{print $1}')
+    echo -e "Firmware Size: ${file_size} MB"
+}
 
 
 CHECK_FILE() {
@@ -150,85 +203,6 @@ DETECT_FILESYSTEM() {
     esac
 }
 
-
-DOWNLOAD_FIRMWARE() {
-    echo " "
-
-    if [ "$#" -lt 4 ]; then
-        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <IMEI> <FW> [VERSION]"
-        return 1
-    fi
-
-    local MODEL="$1"
-    local CSC="$2"
-    local IMEI="$3"
-    local DOWN_DIR="FW/$MODEL"
-    local CUSTOM_VERSION="$5" 
-
-    rm -rf "$DOWN_DIR"
-    mkdir -p "$DOWN_DIR"
-
-    echo -e "======================================"
-    echo -e "   Samsung FW Downloader    "
-    echo -e "======================================"
-    echo -e "MODEL: $MODEL | CSC: $CSC"
-
-    if [ -n "$CUSTOM_URL" ]; then
-        echo -e "📌 Detected Direct Link: $CUSTOM_URL"
-        
-        local FILE_NAME
-        FILE_NAME=$(basename "$CUSTOM_URL" | cut -d'?' -f1)
-        [ -z "$FILE_NAME" ] && FILE_NAME="firmware.zip"
-
-        echo -e "📥 Downloading $FILE_NAME to $DOWN_DIR..."
-        
-        if command -v aria2c >/dev/null 2>&1; then
-            aria2c -x 16 -s 16 -k 1M -d "$DOWN_DIR" -o "$FILE_NAME" "$CUSTOM_URL"
-        elif command -v wget >/dev/null 2>&1; then
-            wget --no-check-certificate -c "$CUSTOM_URL" -O "$DOWN_DIR/$FILE_NAME"
-        else
-            curl -L -k -C - "$CUSTOM_URL" -o "$DOWN_DIR/$FILE_NAME"
-        fi
-
-        if [ $? -ne 0 ]; then
-            echo -e "⛔️ Direct download failed. Please check your URL."
-            return 1
-        fi
-    else
-        if [ -n "$CUSTOM_VERSION" ]; then
-            echo -e "📌 Using custom requested version: $CUSTOM_VERSION"
-            VERSION="$CUSTOM_VERSION"
-        else
-            echo -e "🔍 Checking for latest update..."
-            VERSION=$(python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" checkupdate 2>&1)
-
-            if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
-                echo -e "⛔️ MODEL/CSC/IMEI not valid or no update found."
-                echo -e "Error: $VERSION"
-                return 1
-            fi
-        fi
-
-        if [ -n "$GITHUB_ENV" ]; then
-            echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-        fi
-
-        # --- Step 2: Download Firmware ---
-        python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -v "$VERSION" -O "$DOWN_DIR"
-        if [ $? -ne 0 ]; then
-            echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC/VERSION."
-            return 1
-        fi
-
-        find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
-    fi
-
-    # --- Show Firmware Info ---
-    local file_size
-    file_size=$(du -sh "$DOWN_DIR" 2>/dev/null | cut -f1)
-    echo -e "✅ Download completed!"
-    echo -e "Firmware Directory Size: ${file_size}"
-}
 
 EXTRACT_FIRMWARE() {
     echo " "
@@ -963,14 +937,16 @@ DISABLE_SIGNATURE_VERIFICATION() {
 
 
 PATCH_KNOX_GUARD() {
-    echo "Patching Knox Guard for JDM devices"
+    echo " "
+
 	if [ "$#" -ne 1 ]; then
-        echo "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
+        echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
         return 1
     fi
 
-    echo "${YELLOW}Patching knox guard.${RESET}"
+    echo -e "Patching knox guard."
     local FILE="${1}/smali_classes2/com/samsung/android/knoxguard/service/KnoxGuardSeService.smali"
+    # patch .method public constructor <init>(Landroid/content/Context;)V
     local METHOD_NAME_1=".method public constructor <init>(Landroid/content/Context;)V"
     local REPLACE_BODY_1='
     .locals 0
@@ -993,6 +969,7 @@ PATCH_KNOX_GUARD() {
     REPLACE_SMALI_METHOD "$FILE" "$METHOD_NAME_1" "$REPLACE_BODY_1"
 	rm -rf "$FIRM_DIR/$TARGET_DEVICE/system/system/priv-app/KnoxGuard"
 }
+
 
 UPDATE_SDHMS() {
     if [ "$#" -ne 1 ]; then
@@ -1828,6 +1805,15 @@ APPLY_STOCK_CONFIG() {
         return 1
     fi
 
+    if GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist" >/dev/null 2>&1; then
+        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.product.cpu.abilist")"
+    elif GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist" >/dev/null 2>&1; then
+        local TARGET_ROM_CPU_ABILIST="$(GET_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.cpu.abilist")"
+    else
+        echo "- CPU abilist property not found!"
+        return 1
+    fi
+
 	if [ -z "$STOCK_DEVICE" ] || [ "$STOCK_DEVICE" = "None" ]; then
         echo -e "No target device is set. Just modifying ROM without any device config."
         return 1
@@ -1847,6 +1833,7 @@ APPLY_STOCK_CONFIG() {
         echo -e "$STOCK_DEVICE config found."
         local STOCK_VNDK_VERSION="$(grep -m1 '^STOCK_VNDK_VERSION=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
         local STOCK_HAS_SEPARATE_SYSTEM_EXT="$(grep -m1 '^STOCK_HAS_SEPARATE_SYSTEM_EXT=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
+		local STOCK_DEVICE_CPU_ABILIST="$(grep -m1 '^STOCK_DEVICE_CPU_ABILIST=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local STOCK_DEVICE_CHIPSET="$(grep -m1 '^STOCK_DEVICE_CHIPSET=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local USE_ALT_SDHMS_APP="$(grep -m1 '^USE_ALT_SDHMS_APP=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
 		local STOCK_HAS_ESIM_SUPPORT="$(grep -m1 '^STOCK_HAS_ESIM_SUPPORT=' "${DEVICES_DIR}/$STOCK_DEVICE/config" | cut -d= -f2 | tr -d '\r')"
@@ -1861,6 +1848,13 @@ APPLY_STOCK_CONFIG() {
 	if [ ! -f "$STOCK_ROM_FLOATING_FEATURE" ]; then
         echo "- File not found: STOCK_ROM_FLOATING_FEATURE"
         return 1
+    fi
+
+	if [ "$STOCK_DEVICE_CPU_ABILIST" != "$TARGET_ROM_CPU_ABILIST" ]; then
+        echo "CPU ABI MISMATCH!"
+        echo "STOCK DEVICE CPU ABI: $STOCK_DEVICE_CPU_ABILIST"
+        echo "TARGET ROM CPU ABI  : $TARGET_ROM_CPU_ABILIST"
+        exit 1
     fi
 
     # Remove ESIM files if stock device does not support.
