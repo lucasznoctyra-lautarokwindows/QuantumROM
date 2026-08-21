@@ -24,7 +24,7 @@ export BUILD_PARTITIONS="product,system_ext,system"
 
 if [ "$STOCK_DEVICE" != "None" ]; then
     if curl -fsSL \
-        "https://api.github.com/repos/lucasznoctyra-lautarokwindows/QuantumROM/releases/tags/Nupid_Stiggers" |
+        "https://api.github.com/repos/SN-Abdullah-Al-Noman/QuantumROM/releases/tags/QuantumROM_Devices" |
         jq -e --arg dev "${STOCK_DEVICE}.zip" '.assets[].name == $dev' |
         grep -q true; then
         echo "$STOCK_DEVICE is supported"
@@ -38,7 +38,7 @@ fi
 if [ ! -f "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip" ]; then
     if curl -fsSL --connect-timeout 5 https://www.google.com >/dev/null; then
         wget --no-check-certificate \
-            "https://github.com/lucasznoctyra-lautarokwindows/QuantumROM/releases/download/Nupid_Stiggers/${STOCK_DEVICE}.zip" \
+            "https://github.com/SN-Abdullah-Al-Noman/QuantumROM/releases/download/QuantumROM_Devices/${STOCK_DEVICE}.zip" \
             -O "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip"
     else
 	    rm -rf "$(pwd)/QuantumROM/Devices/${STOCK_DEVICE}.zip"
@@ -88,7 +88,7 @@ PATCH_BT_LIB "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR"
 
 B_ID="$(grep -m1 '^ro.system.build.id=' "$FIRM_DIR/$TARGET_DEVICE/system/system/build.prop" | cut -d= -f2 | tr -d '\r')"
 B_V="$(grep -m1 '^ro.system.build.version.incremental=' "$FIRM_DIR/$TARGET_DEVICE/system/system/build.prop" | cut -d= -f2 | tr -d '\r')"
-BUILD_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.display.id" "ProtonUI Unsigned                                        [${B_ID}.${B_V}]"
-BUILD_PROP "$FIRM_DIR/$TARGET_DEVICE" "product" "ro.build.display.id" "ProtonUI Unsigned                                        [${B_ID}.${B_V}]"
+BUILD_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.display.id" "${B_ID} ${B_V} V-${VERSION}: Built with Quantum Tools"
+BUILD_PROP "$FIRM_DIR/$TARGET_DEVICE" "product" "ro.build.display.id" "${B_ID} ${B_V} V-${VERSION}: Built with Quantum Tools"
 
 BUILD_IMG "$FIRM_DIR/$TARGET_DEVICE" "all" "$OUTPUT_FILESYSTEM" "$OUT_DIR"
