@@ -2361,6 +2361,12 @@ GEN_FILE_CONTEXTS() {
     local EXTRACTED_FIRM_DIR="$1"
     local PARTITION="$2"
 
+	local CONTEXT="u:object_r:system_file:s0"
+        
+    if [[ "$PARTITION" == odm* || "$PARTITION" == vendor* ]]; then
+        CONTEXT="u:object_r:vendor_file:s0"
+    fi
+
     [ ! -d "${EXTRACTED_FIRM_DIR}/$PARTITION" ] && {
         echo -e "- Partition not found: $PARTITION"
         return 1
@@ -2415,12 +2421,6 @@ GEN_FILE_CONTEXTS() {
 
         [[ -n "${EXISTING[$ESCAPED_PATH]-}" ]] && continue
 
-        local CONTEXT="u:object_r:system_file:s0"
-        
-        if [[ "$PARTITION" == odm* || "$PARTITION" == vendor* ]]; then
-            CONTEXT="u:object_r:vendor_file:s0"
-        fi
-
         local BASENAME=$(basename "$item")
 
         if [[ "$BASENAME" == "linker" || "$BASENAME" == "linker64" ]]; then
@@ -2438,6 +2438,11 @@ GEN_FILE_CONTEXTS() {
         EXISTING["$ESCAPED_PATH"]=1
 
     done
+
+    if ! grep -qE "^/${PARTITION}\(/\.\*\)\?[[:space:]]" "$FILE_CONTEXTS"; then
+        printf "/%s(/.*)? %s\n" "$PARTITION" "$CONTEXT" >> "$FILE_CONTEXTS"
+        echo "- Added: /${PARTITION}(/.*)? ${CONTEXT}"
+    fi
 
     echo -e "- $PARTITION file_contexts generated"
 
@@ -2534,9 +2539,13 @@ BUILD_IMG() {
             echo -e "Building f2fs image: $OUT_IMG"
 
             SIZE=$(((EXTRACTED_SIZE + 511) / 512 * 512))
-            EXTENDED_SIZE=$((SIZE + SIZE / 4))
+            EXTENDED_SIZE=$((SIZE + SIZE / 8))
 
-            dd if=/dev/zero of="$OUT_IMG" bs=512 count=$((EXTENDED_SIZE / 512))
+            if [ "$EXTENDED_SIZE" -lt "60000000" ]; then
+                EXTENDED_SIZE="60000000"
+            fi
+
+            truncate -s "$EXTENDED_SIZE" "$OUT_IMG"
 
             $make_f2fs \
                 -f -q \
@@ -2557,7 +2566,6 @@ BUILD_IMG() {
                 "$OUT_IMG"
 
             img2simg "$OUT_IMG" "${OUT_IMG}.sparse"
-
             rm -rf "$OUT_IMG"
             mv "${OUT_IMG}.sparse" "$OUT_IMG"
 
