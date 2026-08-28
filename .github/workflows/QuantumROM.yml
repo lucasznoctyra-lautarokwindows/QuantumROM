@@ -67,7 +67,11 @@ jobs:
           sudo pip3 install git+https://github.com/SN-Abdullah-Al-Noman/samloader.git --break-system-packages
           mkdir -p FW WORK OUT
 
+      - name: Download firmware ▶️ ${{ github.event.inputs.TARGET_DEVICE }} - ${{ github.event.inputs.TARGET_DEVICE_CSC }}
+        run: |
+          source scripts/QuantumRom.sh
           DOWNLOAD_FIRMWARE "${{ github.event.inputs.TARGET_DEVICE }}" "${{ github.event.inputs.TARGET_DEVICE_CSC }}" "${{ github.event.inputs.TARGET_DEVICE_IMEI }}" "FW" "${{ github.event.inputs.TARGET_FW_VERSION }}"
+
       - name: Extract firmware
         run: |
           source scripts/QuantumRom.sh
