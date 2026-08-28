@@ -553,8 +553,12 @@ DISABLE_FBE() {
 ADD_32BIT_HAL_SUPPORT() {
     local PREBUILT_DIR="$(pwd)/prebuilts/r11sxxx"
 
+    echo  " "
+
+    echo -e "Patching 64 blobs to 32-64 blobs."
+    echo -e "- Author: ExtremeXT/Dai-doz"
     # 1. Copy thư mục lib từ prebuilts/r11sxxx
-    echo -e "  - Adding S23 FE (r11sxxx) lib/ blobs..."
+    echo -e "- Adding S23 FE (r11sxxx) from prebuilts"
     if [ -d "$PREBUILT_DIR/system/system/lib" ]; then
         cp -rf "$PREBUILT_DIR/system/system/lib/." "${EXTRACTED_FIRM_DIR}/system/system/lib/"
         chmod -R 644 "${EXTRACTED_FIRM_DIR}/system/system/lib/"* 2>/dev/null
@@ -577,7 +581,7 @@ ADD_32BIT_HAL_SUPPORT() {
     done
 
     # 3. Tạo Symbolic Links & Phân quyền
-    echo -e "  - Creating symlinks..."
+    echo -e "- Creating symlinks"
     local SYS_DIR="${EXTRACTED_FIRM_DIR}/system/system"
 
     # Linker binaries
@@ -593,6 +597,7 @@ ADD_32BIT_HAL_SUPPORT() {
     ln -sf "/apex/com.android.runtime/lib/bionic/libdl_android.so" "$SYS_DIR/lib/libdl_android.so"
     ln -sf "/apex/com.android.runtime/lib/bionic/libm.so" "$SYS_DIR/lib/libm.so"
     chmod 644 "$SYS_DIR/lib/libc.so" "$SYS_DIR/lib/libdl.so" "$SYS_DIR/lib/libdl_android.so" "$SYS_DIR/lib/libm.so" 2>/dev/null
+    echo -e "- Patches complete"
 }
 
 DISABLE_FDE() {
@@ -965,6 +970,7 @@ DISABLE_SIGNATURE_VERIFICATION() {
     fi
 
     echo -e "Disabling signature verification."
+	echo -e "- Author: ShaDisNX255"
 	# https://github.com/ShaDisNX255/NcX_Stock/commit/e9fca1cedf2405c9f84dc2ee4aafa018e59de464
     # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773529
     # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773543
