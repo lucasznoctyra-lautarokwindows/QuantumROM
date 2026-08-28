@@ -32,15 +32,15 @@ chmod +x "$extract_erofs"
 DOWNLOAD_FIRMWARE() {
     echo " "
 
-    if [ "$#" -lt 3 ]; then
-        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <DOWNLOAD_DIRECTORY> [VERSION]"
+    if [ "$#" -lt 4 ]; then
+        echo -e "Usage: ${FUNCNAME[0]} <MODEL> <CSC> <IMEI> <DOWNLOAD_DIRECTORY> [VERSION]"
         return 1
     fi
 
     local MODEL="$1"
     local CSC="$2"
-    local DOWN_DIR="${3}/$MODEL"
-	local VERSION="${4:-}"
+    local IMEI="$3"
+    local DOWN_DIR="${4}/$MODEL"
 
     rm -rf "$DOWN_DIR"
     mkdir -p "$DOWN_DIR"
@@ -50,32 +50,29 @@ DOWNLOAD_FIRMWARE() {
     echo -e "======================================"
     echo -e "MODEL: $MODEL | CSC: $CSC"
 
-    # Check version
-	if [ -z "$VERSION" ]; then
-        VERSION=$($samloader check-update --model "$MODEL" --region "$CSC")
+    VERSION=$(python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" checkupdate 2>&1)
 
-        if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
-            echo "⛔️ MODEL/CSC not valid or no update found."
-            exit 1
-        fi
+    if [ $? -ne 0 ] || [ -z "$VERSION" ]; then
+        echo -e "⛔️ MODEL/CSC/IMEI not valid or no update found."
+        echo -e "Error: $VERSION"
+        return 1
     fi
 
     if [ -n "$GITHUB_ENV" ]; then
         echo "VERSION=$VERSION" >> "$GITHUB_ENV"
     fi
 
-    # Download Firmware
-	local VERSION_FILE="${VERSION//\//_}"
-    $samloader download --model "$MODEL" --region "$CSC" --version "$VERSION" --out-file "$DOWN_DIR/${VERSION_FILE}.zip"
+    # --- Step 2: Download Firmware ---
+    python3 -m samloader -m "$MODEL" -r "$CSC" -i "$IMEI" download -O "$DOWN_DIR"
     if [ $? -ne 0 ]; then
-        echo -e "⛔️ Download failed. Check MODEL/CSC."
+        echo -e "⛔️ Download failed. Check IMEI/MODEL/CSC."
         exit 1
     fi
 
 	find "$DOWN_DIR" -type f -name "*.zip.enc*" -delete
 
-    # Show Firmware Info
-    local file_size=$(du -m "${DOWN_DIR}/${VERSION}.zip" 2>/dev/null | awk '{print $1}')
+    # --- Show Firmware Info ---
+    local file_size=$(du -m "${DOWN_DIR}"/${MODEL}_*_fac.zip 2>/dev/null | cut -f1)
     echo -e "Firmware Size: ${file_size} MB"
 }
 
