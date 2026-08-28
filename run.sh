@@ -12,6 +12,7 @@ export STOCK_DEVICE="$1"
 export TARGET_DEVICE="$2"
 export USE_UI_8_TETHERING_APEX="$3"
 export OUTPUT_FILESYSTEM="$4"
+export TARGET_DEVICE_IMEI="$5"
 
 # Directories
 export FIRM_DIR="$(pwd)/FW"
