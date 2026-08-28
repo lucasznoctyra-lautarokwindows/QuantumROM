@@ -549,53 +549,49 @@ DISABLE_FBE() {
     # =========================================================================
     #  32-Bit HALs Support (QSSI / ESSI / MSSI Target Device)
     # =========================================================================
-        echo -e "- Target device with 32-Bit HALs detected ($TARGET_SINGLE_SYSTEM_IMAGE)."
+local PREBUILT_DIR="$(pwd)/prebuilts/r11sxxx"
 
-        # 1. Copy thư mục lib từ r11sxxx
-        echo -e "  - Adding S23 FE (r11sxxx) lib/ blobs..."
-        if [ -d "$(pwd)/r11sxxx/system/system/lib" ]; then
-            cp -rf "$(pwd)/r11sxxx/system/system/lib/." "${EXTRACTED_FIRM_DIR}/system/system/lib/"
-            chmod -R 644 "${EXTRACTED_FIRM_DIR}/system/system/lib/"* 2>/dev/null
-        fi
-
-        # 2. Copy danh sách APEX & Binaries chỉ định
-        local BLOBS_LIST=(
-            "system/apex/com.android.i18n.apex"
-            "system/apex/com.android.runtime.apex"
-            "system/apex/com.google.android.tzdata6.apex"
-            "system/bin/bootstrap/linker"
-            "system/bin/bootstrap/linker_asan"
-        )
-
-        for blob in "${BLOBS_LIST[@]}"; do
-            if [ -f "$(pwd)/r11sxxx/$blob" ]; then
-                mkdir -p "$(dirname "${EXTRACTED_FIRM_DIR}/$blob")"
-                cp -af "$(pwd)/r11sxxx/$blob" "${EXTRACTED_FIRM_DIR}/$blob"
-            fi
-        done
-
-        # 3. Tạo Symbolic Links & Phân quyền
-        echo -e "  - Creating symlinks..."
-        local SYS_DIR="${EXTRACTED_FIRM_DIR}/system/system"
-
-        # Linker binaries
-        mkdir -p "$SYS_DIR/bin"
-        ln -sf "/apex/com.android.runtime/bin/linker" "$SYS_DIR/bin/linker"
-        ln -sf "/apex/com.android.runtime/bin/linker" "$SYS_DIR/bin/linker_asan"
-        chmod 755 "$SYS_DIR/bin/linker" "$SYS_DIR/bin/linker_asan" 2>/dev/null
-
-        # System libraries
-        mkdir -p "$SYS_DIR/lib"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libc.so" "$SYS_DIR/lib/libc.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libdl.so" "$SYS_DIR/lib/libdl.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libdl_android.so" "$SYS_DIR/lib/libdl_android.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libm.so" "$SYS_DIR/lib/libm.so"
-        chmod 644 "$SYS_DIR/lib/libc.so" "$SYS_DIR/lib/libdl.so" "$SYS_DIR/lib/libdl_android.so" "$SYS_DIR/lib/libm.so" 2>/dev/null
-    else
-        echo -e "- Target device does not use 32-Bit HALs. Ignoring."
+    # 1. Copy thư mục lib từ prebuilts/r11sxxx
+    echo -e "  - Adding S23 FE (r11sxxx) lib/ blobs..."
+    if [ -d "$PREBUILT_DIR/system/system/lib" ]; then
+        cp -rf "$PREBUILT_DIR/system/system/lib/." "${EXTRACTED_FIRM_DIR}/system/system/lib/"
+        chmod -R 644 "${EXTRACTED_FIRM_DIR}/system/system/lib/"* 2>/dev/null
     fi
-}
 
+    # 2. Copy danh sách APEX & Binaries chỉ định
+    local BLOBS_LIST=(
+        "system/apex/com.android.i18n.apex"
+        "system/apex/com.android.runtime.apex"
+        "system/apex/com.google.android.tzdata6.apex"
+        "system/bin/bootstrap/linker"
+        "system/bin/bootstrap/linker_asan"
+    )
+
+    for blob in "${BLOBS_LIST[@]}"; do
+        if [ -f "$PREBUILT_DIR/$blob" ]; then
+            mkdir -p "$(dirname "${EXTRACTED_FIRM_DIR}/$blob")"
+            cp -af "$PREBUILT_DIR/$blob" "${EXTRACTED_FIRM_DIR}/$blob"
+        fi
+    done
+
+    # 3. Tạo Symbolic Links & Phân quyền
+    echo -e "  - Creating symlinks..."
+    local SYS_DIR="${EXTRACTED_FIRM_DIR}/system/system"
+
+    # Linker binaries
+    mkdir -p "$SYS_DIR/bin"
+    ln -sf "/apex/com.android.runtime/bin/linker" "$SYS_DIR/bin/linker"
+    ln -sf "/apex/com.android.runtime/bin/linker" "$SYS_DIR/bin/linker_asan"
+    chmod 755 "$SYS_DIR/bin/linker" "$SYS_DIR/bin/linker_asan" 2>/dev/null
+
+    # System libraries
+    mkdir -p "$SYS_DIR/lib"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libc.so" "$SYS_DIR/lib/libc.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libdl.so" "$SYS_DIR/lib/libdl.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libdl_android.so" "$SYS_DIR/lib/libdl_android.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libm.so" "$SYS_DIR/lib/libm.so"
+    chmod 644 "$SYS_DIR/lib/libc.so" "$SYS_DIR/lib/libdl.so" "$SYS_DIR/lib/libdl_android.so" "$SYS_DIR/lib/libm.so" 2>/dev/null
+}
 
 DISABLE_FDE() {
     local EXTRACTED_FIRM_DIR="$1"
