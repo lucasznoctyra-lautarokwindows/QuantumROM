@@ -545,11 +545,13 @@ DISABLE_FBE() {
             sed -i -e 's/^\([^#].*\)fileencryption=[^,]*\(.*\)$/# &\n\1encryptable\2/g' "$i"
         fi
     done
+}
 
     # =========================================================================
     #  32-Bit HALs Support (QSSI / ESSI / MSSI Target Device)
     # =========================================================================
-local PREBUILT_DIR="$(pwd)/prebuilts/r11sxxx"
+ADD_32BIT_HAL_SUPPORT() {
+    local PREBUILT_DIR="$(pwd)/prebuilts/r11sxxx"
 
     # 1. Copy thư mục lib từ prebuilts/r11sxxx
     echo -e "  - Adding S23 FE (r11sxxx) lib/ blobs..."
