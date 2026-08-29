@@ -24,7 +24,7 @@ export BUILD_PARTITIONS="product,system_ext,system"
 
 if [ "$STOCK_DEVICE" != "None" ]; then
     if curl -fsSL \
-        "https://api.github.com/repos/SN-Abdullah-Al-Noman/QuantumROM/releases/tags/QuantumROM_Devices" |
+        "https://api.github.com/repos/lucasznoctyra-lautarokwindows/QuantumROM/releases/tags/QuantumROM_Devices" |
         jq -e --arg dev "${STOCK_DEVICE}.zip" '.assets[].name == $dev' |
         grep -q true; then
         echo "$STOCK_DEVICE is supported"
