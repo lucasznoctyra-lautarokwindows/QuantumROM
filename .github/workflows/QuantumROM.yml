@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       STOCK_DEVICE:
-        description: "STOCK_DEVICE_MODEL or None"
+        description: "Your own device model or None"
         required: true
         default: "SM-A225F"
 
@@ -18,8 +18,8 @@ on:
         required: true
         default: "SM-A346E"
 
-      TARGET_DEVICE_CSC:
-        description: "TARGET_DEVICE_CSC."
+      TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK:
+        description: "Input target device CSC code or direct download link."
         required: true
         default: "BKD"
 
@@ -28,12 +28,12 @@ on:
         required: false
 
       OUTPUT_FILESYSTEM:
-        description: "OUTPUT_FILESYSTEM. e.g erofs / ext4 / f2fs"
+        description: "Output filesystem. e.g erofs / ext4 / f2fs"
         required: true
         default: "erofs"
 
       COMPRESS_IMG_TO_XZ:
-        description: "Compress IMG to XZ (True/False)"
+        description: "Compress img to xz (True/False)"
         required: true
         default: "False"
 
@@ -93,7 +93,7 @@ jobs:
 
           echo "STOCK_DEVICE=${{ inputs.STOCK_DEVICE }}" | tee -a "$GITHUB_ENV"
           echo "TARGET_DEVICE=${{ inputs.TARGET_DEVICE }}" | tee -a "$GITHUB_ENV"
-          echo "TARGET_DEVICE_CSC=${{ inputs.TARGET_DEVICE_CSC }}" | tee -a "$GITHUB_ENV"
+          echo "TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK=${{ inputs.TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK }}" | tee -a "$GITHUB_ENV"
           echo "TARGET_FW_VERSION=${{ inputs.TARGET_FW_VERSION }}" | tee -a "$GITHUB_ENV"
 
           echo "DEBLOAT_ROM=${{ inputs.DEBLOAT_ROM }}" | tee -a "$GITHUB_ENV"
@@ -147,12 +147,15 @@ jobs:
           sudo apt install -y p7zip-full lz4 liblz4-1 liblz4-dev libzstd1 libzstd-dev build-essential android-sdk-libsparse-utils \
               f2fs-tools fuse2fs fuse e2fsprogs python3 python3-pip zipalign unzip openjdk-21-jdk jq perl xxd kmod erofs-utils curl wget
           sudo modprobe f2fs || true
+          git clone https://github.com/SN-Abdullah-Al-Noman/GoFileDownloader.git
+          cd GoFileDownloader
+          pip install -r requirements.txt
           mkdir -p FW WORK OUT
 
-      - name: Download firmware ▶️ ${{ inputs.TARGET_DEVICE }} - ${{ inputs.TARGET_DEVICE_CSC }}
+      - name: Download firmware ▶️ ${{ inputs.TARGET_DEVICE }} - ${{ inputs.TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK }}
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
-          DOWNLOAD_FIRMWARE "$TARGET_DEVICE" "$TARGET_DEVICE_CSC" "$FIRM_DIR" "$TARGET_FW_VERSION"
+          DOWNLOAD_FIRMWARE "$TARGET_DEVICE" "$TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK" "$FIRM_DIR" "$TARGET_FW_VERSION"
 
       - name: Extract firmware
         run: |
@@ -288,4 +291,11 @@ jobs:
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
         run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+          export ANDROID_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.release")
+          export ONEUI_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.oneui")
+          export BUILD_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.incremental")
+          export SDK_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.sdk")
+          export SECURITY_PATCH=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.security_patch")
+          export CPU_ABILIST=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.product.cpu.abilist")
           bash release.sh
