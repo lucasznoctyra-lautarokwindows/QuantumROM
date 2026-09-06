@@ -256,12 +256,8 @@ jobs:
       - name: Apply others features and patch
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
-          trap 'echo "ERROR: line=${LINENO} file=${BASH_SOURCE[0]} command=${BASH_COMMAND}"; echo "FUNCNAME: ${FUNCNAME[*]}"' ERR
-          PS4='+ ${BASH_SOURCE}:${LINENO}: '
-          set -x
           PATCH_SELINUX "$FIRM_DIR/$TARGET_DEVICE"
           DISABLE_SECURITY "$FIRM_DIR/$TARGET_DEVICE"
-          set +x
 
       - name: Build img - ${{ inputs.OUTPUT_FILESYSTEM }}
         run: |
@@ -293,7 +289,8 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
           export ANDROID_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.release")
-          export ONEUI_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.oneui")
+          ONEUI_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.oneui")
+          export ONEUI_VERSION=$(echo "$ONEUI_VERSION" | sed -E 's/^([0-9])0+$/\1.0/; s/^([0-9])([0-9]*)0+$/\1.\2/')
           export BUILD_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.incremental")
           export SDK_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.sdk")
           export SECURITY_PATCH=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.security_patch")
