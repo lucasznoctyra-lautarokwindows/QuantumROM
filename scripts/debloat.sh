@@ -3,19 +3,18 @@
 
 # GENERAL / SYSTEM / BLOAT
 DEBLOAT_APPS=(
-"HMT" "PaymentFramework" "DigitalWellbeing" "FactoryCameraFB"
+"HMT" "DigitalWellbeing" "FactoryCameraFB"
 "WlanTest" "AirGlance" "AirReadingGlass" "AndroidGlassesCore"
-"SOAgent77" "ARCore" "ARDrawing" "ARZone" "BGMProvider"
-"SingleTakeService" "BixbyWakeup" "BlockchainBasicKit"
+"SOAgent77" "ARCore" "ARDrawing" "ARZone"
+"SingleTakeService" "BlockchainBasicKit"
 "Cameralyzer" "DictDiotekForSec" "EasymodeContactsWidget81"
 "Fast" "FunModeSDK" "GearManagerStub" "KidsHome_Installer"
 "LinkSharing_v11" "LiveDrawing" "MAPSAgent" "MdecService"
 "MinusOnePage" "MoccaMobile" "Netflix_stub" "Notes40"
 "ParentalCare" "PhotoTable" "SmartReminder" "SmartSwitchStub"
-"UnifiedWFC" "UniversalMDMClient" "VideoEditorLite_Dream_N"
-"VisionIntelligence3.7" "VoiceAccess" "VTCameraSetting"
+"UnifiedWFC" "UniversalMDMClient" "VoiceAccess" "VTCameraSetting"
 "WebManual" "WifiGuider" "AutomationTest_FB" "FactoryTestProvider"
-"StickerCenter" "CIDManager" "FacAtFunction" "serviceModeApp_FB"
+"CIDManager" "FacAtFunction" "serviceModeApp_FB"
 )
 
 
@@ -25,7 +24,7 @@ CARRIER_APPS=(
 "LGUMiniCustomerCenter" "LGUplusTsmProxy"
 "SKTMemberShip_new" "SktUsimService" "TWorld"
 "KT114Provider2" "KTHiddenMenu" "KTOneStore"
-"KTServiceAgent" "KTServiceMenu"
+"KTServiceAgent" "KTServiceMenu" "LGUIxio_Stub"
 "LGUGPSnWPS" "LGUHiddenMenu" "LGUOZStore"
 "SKTFindLostPhone" "SKTHiddenMenu" "SKTMemberShip"
 "SKTOneStore" "SKTFindLostPhoneApp"
@@ -39,12 +38,25 @@ SAMSUNG_APPS=(
 "SamsungTTS" "SamsungBilling"
 "OneDrive_Samsung_v3" "SamsungCarKeyFw"
 "SamsungPass" "SamsungSmartSuggestions"
-"SamsungPassAutofill_v1"
+"SamsungPassAutofill_v1" "WarrantyCare"
 "AirCommand" "AppUpdateCenter" "AREmoji"
 "AREmojiEditor" "AutoDoodle" "AvatarEmojiSticker"
 "AvatarEmojiSticker_S" "AvatarPicker"
 "GalleryWidget" "LiveStickers" "StoryService"
-"StickerFaceARAvatar" "sticker"
+"StickerFaceARAvatar" "sticker" "PaymentFramework"
+)
+
+
+# SAMSUNG DEX APPS
+SAMSUNG_DEX_APPS=("DeXonPC" "DesktopModeUiService" "KnoxDesktopLauncher"
+"SystemUIDesktop" "DexCommunity" "KnoxContainerDesktop"
+)
+
+
+# SAMSUNG BIXBY APPS
+SAMSUNG_BIXBY_APPS=(
+"BixbyWakeup" "VisionIntelligence3.7" "Bixby" "BixbyService"
+"BixbyVisionFramework3.5" "SystemUIBixby2" "VisionModel-Stub"
 )
 
 
@@ -64,8 +76,8 @@ GOOGLE_APPS=(
 "AssistantShell" "BardShell" "DuoStub"
 "GoogleCalendarSyncAdapter" "AndroidDeveloperVerifier"
 "YourPhone_Stub" "AndroidAutoStub" "FamilyLinkParentalControls"
-"AndroidSystemIntelligence" "GoogleRestore"
-"SamsungMessages" "SearchSelector" "PlayAutoInstallConfig" "FamilyLinkParentalControls"
+"AndroidSystemIntelligence" "GoogleRestore" "SamsungMessages"
+"SearchSelector" "PlayAutoInstallConfig" "FamilyLinkParentalControls"
 )
 
 
