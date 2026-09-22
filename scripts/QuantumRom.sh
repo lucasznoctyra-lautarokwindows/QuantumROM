@@ -648,6 +648,9 @@ DISABLE_FDE() {
 
 INSTALL_FRAMEWORK() {
     echo " "
+    echo -e "Patch framework"
+    echo -e "Authors: Al noman"
+    echo -e "Processing..."
 
     if [ "$#" -ne 2 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <APKTOOL_JAR_DIR> <framework-res.apk>"
@@ -665,6 +668,7 @@ INSTALL_FRAMEWORK() {
     fi
 
     java -jar "$APKTOOL" install-framework "$framework_apk"
+    echo -e "Patch done"
 }
 
 
@@ -815,6 +819,9 @@ HEX_PATCH() {
 
 PATCH_FLAG_SECURE() {
 	echo " "
+	echo -e "Patch flag secure"
+	echo -e "Authors: Al noman / ShaDisNX255"
+	echo -e "Processing..."
 
 	if [ "$#" -ne 2 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRMWARE_DIRECTORY> <EXTRACTED_SERVICES_DIRECTORY>"
@@ -843,7 +850,6 @@ PATCH_FLAG_SECURE() {
     return-object v0
     '
 
-	echo -e "Patching flag secure."
 
     local EXTRACTED_FIRM_DIR="$1"
 	local WORK_DIR="$2"
@@ -905,11 +911,15 @@ PATCH_FLAG_SECURE() {
 	if [[ -v FILE_3 ]]; then
         REPLACE_SMALI_METHOD "$FILE_3" "$METHOD_NAME_3" "$REPLACE_BODY_1"
     fi
+    echo -e "Patch done"
 }
 
 
 PATCH_SECURE_FOLDER() {
     echo " "
+    echo -e "Patch secure folder"
+    echo -e "Authors: unknow"
+    echo -e "Processing..."
 
 	if [ "$#" -ne 2 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRMWARE_DIRECTORY> <EXTRACTED_SERVICES_DIRECTORY>"
@@ -925,7 +935,6 @@ PATCH_SECURE_FOLDER() {
     return v0
     '
 
-    echo -e "Patching secure folder."
 
 	local EXTRACTED_FIRM_DIR="$1"
 	local WORK_DIR="$2"
@@ -953,6 +962,7 @@ PATCH_SECURE_FOLDER() {
             return 1
             ;;
     esac
+    echo -e "Patch done"
 }
 
 
@@ -1011,7 +1021,7 @@ DISABLE_SIGNATURE_VERIFICATION() {
 PATCH_KNOX_GUARD() {
     echo " "
     echo -e "Patch knox guard"
-    echo -e "Author: Dai-doz / Salvo Giangreco"
+    echo -e "Authors: Dai-doz / Salvo Giangreco / Al noman"
     echo -e "Processing..."
 
 	if [ "$#" -ne 1 ]; then
@@ -1069,6 +1079,9 @@ UPDATE_SDHMS() {
 
 PATCH_SSRM() {
     echo " "
+    echo -e "Patch SSRM warning"
+    echo -e "Authors: Al noman "
+    echo -e "Processing..."
 
     if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SSRM_DIRECTORY>"
@@ -1079,7 +1092,7 @@ PATCH_SSRM() {
     local FILE="$SSRM_DIR/smali/com/android/server/ssrm/Feature.smali"
 
     echo -e "Patching SSRM."
-    echo -e "- Patching: $FILE"
+    echo -e "Processing: $FILE"
 
 	if [ ! -f "$FILE" ]; then
 	    echo "- File name not found: $FILE"
@@ -1117,11 +1130,15 @@ PATCH_SSRM() {
     else
         echo "- SIOP policy file name not found."
     fi
+    echo -e "Patch done"
 }
 
 
 PATCH_BT_LIB() {
     echo " "
+    echo -e "Patch Bluetooth library [DEBUG]"
+    echo -e "Authors: 3arthur6"
+    echo -e "Processing,,,"
 
 	if [ "$#" -ne 2 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRM_DIRECTORY> <WORK_DIR>"
@@ -1132,7 +1149,6 @@ PATCH_BT_LIB() {
 	local WORK_DIR="$2"
 	local BT_LIB_FILE="$WORK_DIR/libbluetooth_jni.so"
 
-    echo -e "Patching Bluetooth library."
     # Get libbluetooth_jni.so
     if ! ls "$EXTRACTED_FIRM_DIR"/system/system/apex/com.android.bt*.apex >/dev/null 2>&1; then
         echo -e "- No bluetooth apex file found."
@@ -1216,11 +1232,16 @@ PATCH_BT_LIB() {
     fi
 
     return 0
+    echo -e "Patch done"
 }
 
 
 FIX_VNDK() {
     echo " "
+    echo -e "Patch vndk mismatch"
+    echo -e "Authors: Dai-doz / Al noman"
+    echo -e "Processing..."
+
 
     if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRM_DIRECTORY>"
@@ -1468,6 +1489,9 @@ GET_SYSTEM_EXT_DIR() {
 
 PATCH_SELINUX() {
     echo " "
+    echo -e "Patch SELINUX contexts"
+    echo -e "Authors: Al noman"
+    echo -e "Processing..."
 
     if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRM_DIR>"
@@ -1477,7 +1501,6 @@ PATCH_SELINUX() {
 	local EXTRACTED_FIRM_DIR="$1"
 	local TARGET_ROM_SYSTEM_EXT_DIR="$(GET_SYSTEM_EXT_DIR "$EXTRACTED_FIRM_DIR")"
 
-    echo -e "Patching selinux."
 
 	UNSUPPORTED_SELINUX=("audiomirroring" "fabriccrypto" "hal_dsms_default" "qb_id_prop" "hal_dsms_service" "proc_compaction_proactiveness" "sbauth" "ker_app" "kpp_app" "kpp_data" "attiqi_app" "kpoc_charger" "sec_diag" "mosey_app" "vendor_smcinvoke_device" "perf_prop" "uwb_regulation_skip_prop")
 
@@ -1515,6 +1538,7 @@ PATCH_SELINUX() {
 	else
         echo -e "- No system_ext directory found."
     fi
+    echo -e "Patch done"
 }
 
 
@@ -2124,6 +2148,9 @@ REMOVE_TLC_ICC() {
 
 DISABLE_SECURITY() {
     echo " "
+    echo -e "Patch FRP"
+    echo -e "Authors: Al noman"
+    echo -e "Processing..."
 
     if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRM_DIR>"
@@ -2152,6 +2179,7 @@ DISABLE_SECURITY() {
 	DISABLE_FBE "$EXTRACTED_FIRM_DIR"
 	DISABLE_FDE "$EXTRACTED_FIRM_DIR"
 	REMOVE_TLC_ICC "$EXTRACTED_FIRM_DIR"
+	echo -e "Patch done"
 }
 
 
