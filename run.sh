@@ -62,6 +62,7 @@ INSTALL_FRAMEWORK "$APKTOOL" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/f
 DECOMPILE "$APKTOOL" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/ssrm.jar" "$WORK_DIR"
 DECOMPILE "$APKTOOL" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/services.jar" "$WORK_DIR"
 
+PATCH_KNOX_GUARD "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
 PATCH_SSRM "$WORK_DIR/ssrm"
 PATCH_FLAG_SECURE "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
 PATCH_SECURE_FOLDER "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
