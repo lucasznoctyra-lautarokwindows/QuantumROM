@@ -121,6 +121,7 @@ jobs:
           echo "PATCH_FLAG_SECURE=${{ inputs.PATCH_FLAG_SECURE }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_SECURE_FOLDER=${{ inputs.PATCH_SECURE_FOLDER }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_BLUETOOTH_LIBRARY=${{ inputs.PATCH_BLUETOOTH_LIBRARY }}" | tee -a "$GITHUB_ENV"
+          echo "PATCH_LIBS=${{ inputs.PATCH_LIBS }}" | tee -a "$GITHUB_ENV"
 
           echo "OUTPUT_FILESYSTEM=${{ inputs.OUTPUT_FILESYSTEM }}" | tee -a "$GITHUB_ENV"
           echo "COMPRESS_IMG_TO_XZ=${{ inputs.COMPRESS_IMG_TO_XZ }}" | tee -a "$GITHUB_ENV"
