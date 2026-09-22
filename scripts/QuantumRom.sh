@@ -1544,7 +1544,6 @@ PATCH_SELINUX() {
 PATCH_32BIT_HALS() {
     echo " "
     echo -e "Patch 32-Bit HALs"
-    echo -e "Authors: Dai-doz"
     echo -e "Processing..."
 
     if [ "$#" -ne 1 ]; then
@@ -1553,52 +1552,45 @@ PATCH_32BIT_HALS() {
     fi
 
     local EXTRACTED_FIRM_DIR="$1"
-    local TARGET_SINGLE_SYSTEM_IMAGE=$(GET_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.target.single_system_image")
 
-    if [[ "$TARGET_SINGLE_SYSTEM_IMAGE" == "qssi" || "$TARGET_SINGLE_SYSTEM_IMAGE" == "essi" ]]; then
-        echo -e "- Target device with 32-Bit HALs detected."
-
-        echo -e "- Adding S23 FE (r11sxxx) lib/ blobs"
-        if [ -d "${QT_DIR}/prebuilts/r11sxxx/system/lib" ]; then
-            mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/lib"
-            cp -rfa "${QT_DIR}/prebuilts/r11sxxx/system/lib/." "${EXTRACTED_FIRM_DIR}/system/system/lib/"
-        fi
-
-        local BLOBS_LIST="
-        system/apex/com.android.i18n.apex
-        system/apex/com.android.runtime.apex
-        system/apex/com.google.android.tzdata6.apex
-        system/bin/bootstrap/linker
-        system/bin/bootstrap/linker_asan
-        "
-
-        for blob in $BLOBS_LIST; do
-            if [ -f "${QT_DIR}/prebuilts/r11sxxx/$blob" ]; then
-                mkdir -p "$(dirname "${EXTRACTED_FIRM_DIR}/system/$blob")"
-                cp -fa "${QT_DIR}/prebuilts/r11sxxx/$blob" "${EXTRACTED_FIRM_DIR}/system/$blob"
-            fi
-        done
-
-        echo -e "- Creating symlinks"
-        ln -sf "/apex/com.android.runtime/bin/linker" "${EXTRACTED_FIRM_DIR}/system/system/bin/linker"
-        ln -sf "/apex/com.android.runtime/bin/linker" "${EXTRACTED_FIRM_DIR}/system/system/bin/linker_asan"
-
-        ln -sf "/apex/com.android.runtime/lib/bionic/libc.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libc.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libdl.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libdl.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libdl_android.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libdl_android.so"
-        ln -sf "/apex/com.android.runtime/lib/bionic/libm.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libm.so"
-
-        echo -e "- Setting props"
-        BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist" "arm64-v8a"
-        BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist32" ""
-        BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist64" "arm64-v8a"
-        BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.zygote" "zygote64"
-        BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "dalvik.vm.dex2oat64.enabled" "true"
-
-        echo -e "Patch done"
-    else
-        echo -e "- Target device does not use 32-Bit HALs. Ignoring."
+    echo -e "- Adding S23 FE (r11sxxx) lib/ blobs"
+    if [ -d "${QT_DIR}/prebuilts/r11sxxx/system/lib" ]; then
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/lib"
+        cp -rfa "${QT_DIR}/prebuilts/r11sxxx/system/lib/." "${EXTRACTED_FIRM_DIR}/system/system/lib/"
     fi
+
+    local BLOBS_LIST="
+    system/apex/com.android.i18n.apex
+    system/apex/com.android.runtime.apex
+    system/apex/com.google.android.tzdata6.apex
+    system/bin/bootstrap/linker
+    system/bin/bootstrap/linker_asan
+    "
+
+    for blob in $BLOBS_LIST; do
+        if [ -f "${QT_DIR}/prebuilts/r11sxxx/$blob" ]; then
+            mkdir -p "$(dirname "${EXTRACTED_FIRM_DIR}/system/$blob")"
+            cp -fa "${QT_DIR}/prebuilts/r11sxxx/$blob" "${EXTRACTED_FIRM_DIR}/system/$blob"
+        fi
+    done
+
+    echo -e "- Creating symlinks"
+    ln -sf "/apex/com.android.runtime/bin/linker" "${EXTRACTED_FIRM_DIR}/system/system/bin/linker"
+    ln -sf "/apex/com.android.runtime/bin/linker" "${EXTRACTED_FIRM_DIR}/system/system/bin/linker_asan"
+
+    ln -sf "/apex/com.android.runtime/lib/bionic/libc.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libc.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libdl.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libdl.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libdl_android.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libdl_android.so"
+    ln -sf "/apex/com.android.runtime/lib/bionic/libm.so" "${EXTRACTED_FIRM_DIR}/system/system/lib/libm.so"
+
+    echo -e "- Setting props"
+    BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist" "arm64-v8a"
+    BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist32" ""
+    BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.vendor.product.cpu.abilist64" "arm64-v8a"
+    BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "ro.zygote" "zygote64"
+    BUILD_PROP "$EXTRACTED_FIRM_DIR" "vendor" "dalvik.vm.dex2oat64.enabled" "true"
+
+    echo -e "Patch done"
 }
 
 UPDATE_FLOATING_FEATURE() {
