@@ -1010,13 +1010,15 @@ DISABLE_SIGNATURE_VERIFICATION() {
 
 PATCH_KNOX_GUARD() {
     echo " "
+    echo -e "Patch knox guard"
+    echo -e "Author: Dai-doz / Salvo Giangreco"
+    echo -e "Processing..."
 
 	if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
         return 1
     fi
 
-    echo -e "Patching knox guard."
     local FILE="${1}/smali_classes2/com/samsung/android/knoxguard/service/KnoxGuardSeService.smali"
     # patch .method public constructor <init>(Landroid/content/Context;)V
     local METHOD_NAME_1=".method public constructor <init>(Landroid/content/Context;)V"
@@ -1040,6 +1042,7 @@ PATCH_KNOX_GUARD() {
     '
     REPLACE_SMALI_METHOD "$FILE" "$METHOD_NAME_1" "$REPLACE_BODY_1"
 	rm -rf "$FIRM_DIR/$TARGET_DEVICE/system/system/priv-app/KnoxGuard"
+    echo -e "Patch done"
 }
 
 
