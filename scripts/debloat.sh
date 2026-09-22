@@ -3,18 +3,19 @@
 
 # GENERAL / SYSTEM / BLOAT
 DEBLOAT_APPS=(
-"HMT" "DigitalWellbeing" "FactoryCameraFB"
+"HMT" "PaymentFramework" "FactoryCameraFB"
 "WlanTest" "AirGlance" "AirReadingGlass" "AndroidGlassesCore"
-"SOAgent77" "ARCore" "ARDrawing" "ARZone"
+"SOAgent77" "BGMProvider"
 "SingleTakeService" "BlockchainBasicKit"
 "Cameralyzer" "DictDiotekForSec" "EasymodeContactsWidget81"
 "Fast" "FunModeSDK" "GearManagerStub" "KidsHome_Installer"
-"LinkSharing_v11" "LiveDrawing" "MAPSAgent" "MdecService"
+"LinkSharing_v11" "MAPSAgent" "MdecService"
 "MinusOnePage" "MoccaMobile" "Netflix_stub" "Notes40"
-"ParentalCare" "PhotoTable" "SmartReminder" "SmartSwitchStub"
-"UnifiedWFC" "UniversalMDMClient" "VoiceAccess" "VTCameraSetting"
+"ParentalCare" "PhotoTable" "SmartReminder"
+"UnifiedWFC" "UniversalMDMClient" "VideoEditorLite_Dream_N"
+"VisionIntelligence3.7" "VoiceAccess" "VTCameraSetting"
 "WebManual" "WifiGuider" "AutomationTest_FB" "FactoryTestProvider"
-"CIDManager" "FacAtFunction" "serviceModeApp_FB"
+"StickerCenter" "CIDManager" "FacAtFunction" "serviceModeApp_FB"
 )
 
 
@@ -35,15 +36,15 @@ CARRIER_APPS=(
 
 # SAMSUNG FEATURES / APPS
 SAMSUNG_APPS=(
-"SamsungTTS" "SamsungBilling"
+"SamsungCalendar" "SamsungTTS" "SamsungBilling"
 "OneDrive_Samsung_v3" "SamsungCarKeyFw"
-"SamsungPass" "SamsungSmartSuggestions"
-"SamsungPassAutofill_v1" "WarrantyCare"
-"AirCommand" "AppUpdateCenter" "AREmoji"
-"AREmojiEditor" "AutoDoodle" "AvatarEmojiSticker"
+"SamsungPass"
+"SamsungPassAutofill_v1"
+"AirCommand" "AppUpdateCenter"
+"AvatarEmojiSticker"
 "AvatarEmojiSticker_S" "AvatarPicker"
-"GalleryWidget" "LiveStickers" "StoryService"
-"StickerFaceARAvatar" "sticker" "PaymentFramework"
+"LiveStickers" "StoryService"
+"sticker"
 )
 
 
@@ -62,8 +63,6 @@ SAMSUNG_BIXBY_APPS=(
 
 # SAMSUNG AI / SMART
 SAMSUNG_AI=(
-"LiveTranscribe" "Bixby"
-"BixbyVisionFramework3.5" "SettingsBixby"
 "SmartEye" "SmartPush" "SmartPush_64"
 "SmartThingsKit" "SmartTouchCall"
 "VisionIntelligence3.7"
@@ -73,10 +72,10 @@ SAMSUNG_AI=(
 # GOOGLE APPS
 GOOGLE_APPS=(
 "SpeechServicesByGoogle" "Maps" "Duo" "Photos"
-"AssistantShell" "BardShell" "DuoStub"
-"GoogleCalendarSyncAdapter" "AndroidDeveloperVerifier"
-"YourPhone_Stub" "AndroidAutoStub" "FamilyLinkParentalControls"
-"AndroidSystemIntelligence" "GoogleRestore" "SamsungMessages"
+"AssistantShell" "BardShell" "DuoStub" "YouTube"
+"GoogleCalendarSyncAdapter" "AndroidDeveloperVerifier" "Gmail2"
+"YourPhone_Stub" "FamilyLinkParentalControls"
+"AndroidSystemIntelligence" "GoogleRestore"
 "SearchSelector" "PlayAutoInstallConfig" "FamilyLinkParentalControls"
 )
 
@@ -97,26 +96,24 @@ HARDWARE_DRIVERS=(
 # MISC / SERVICES
 MISC_SERVICES=(
 "AuthFramework" "Discover" "DiscoverSEP"
-"EarphoneTypeC" "EasySetup"
-"HashTagService" "LedCoverService"
-"LinkToWindowsService" "MemorySaver_O_Refresh"
-"MultiControl" "MultiControlVP6"
+"EasySetup"
+"HashTagService"
+"MemorySaver_O_Refresh"
 "OMCAgent5" "OneStoreService" "FactoryAirCommandManager"
 "SOAgent7" "SOAgent75" "SOAgent76"
 "SolarAudio-service" "SPPPushClient"
 "SumeNNService" "SVoiceIME"
 "SwiftkeyIme" "SwiftkeySetting"
-"TADownloader"
-"TalkbackSE" "TalkBack" "TaPackAuthFw"
+"TADownloader" "TaPackAuthFw"
 "UltraDataSaving_O" "Upday"
-"YourPhone_P1_5" "DsmsAPK"
+"DsmsAPK"
 "vexfwk_service" "VexScanner"
-"LiveEffectService" "MyGalaxyService"
+"MyGalaxyService"
 )
 
 
 # Knox
-KNOX_APPS=("Rampart" "KnoxFrameBufferProvider")
+KNOX_APPS=("KnoxFrameBufferProvider")
 
 
 REMOVE_ESIM_FILES() {
