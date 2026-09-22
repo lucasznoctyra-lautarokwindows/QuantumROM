@@ -1545,6 +1545,7 @@ PATCH_32BIT_HALS() {
     echo " "
     echo -e "Patch 32-Bit HALs"
     echo -e "Processing..."
+    echo -e "Authors: Dai-doz"
 
     if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_FIRM_DIR>"
