@@ -194,7 +194,7 @@ jobs:
           source "$(pwd)/scripts/QuantumRom.sh"
           DECODE_OMC "$FIRM_DIR/$TARGET_DEVICE" "$OUT_DIR"
 
-     - name: Patch libs for 64bit only build
+      - name: Patch libs for 64bit only build
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
