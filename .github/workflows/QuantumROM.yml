@@ -37,6 +37,11 @@ on:
         required: true
         default: "False"
 
+      PATCH_LIBS:
+        description: "Patch libs for 64bit only ROM (True/False)"
+        required: true
+        default: "false"
+
       DEBLOAT_ROM:
         description: "Debloat downloaded rom (True/False)"
         required: true
@@ -188,6 +193,15 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
           DECODE_OMC "$FIRM_DIR/$TARGET_DEVICE" "$OUT_DIR"
+
+     - name: Patch libs for 64bit only build
+        run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+
+          if [ "$PATCH_LIBS" = "True" ]; then
+              PATCH_32BIT_HALS "$FIRM_DIR/$TARGET_DEVICE"
+          fi
+
 
       - name: Debloat Rom - ${{ inputs.DEBLOAT_ROM }}
         run: |
