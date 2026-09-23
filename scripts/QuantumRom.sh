@@ -1167,9 +1167,10 @@ DISABLE_SIGNATURE_VERIFICATION() {
 
     local WORK_DIR="$1"
     local SEC_DIR="$2"
+    local TARGET_DIR="$WORK_DIR/services"
 
-    if [ ! -d "$WORK_DIR" ]; then
-        echo -e "- Directory not found: $WORK_DIR"
+    if [ ! -d "$TARGET_DIR" ]; then
+        echo -e "- Directory not found: $TARGET_DIR"
         return 1
     fi
 
@@ -1185,8 +1186,8 @@ DISABLE_SIGNATURE_VERIFICATION() {
     local PATCH_FILE="$QT_DIR/QuantumROM/patches/signature/services.jar/0001-Allow-custom-platform-signature.patch"
     if [ -f "$PATCH_FILE" ]; then
         echo -e "- Applying patch: 0001-Allow-custom-platform-signature.patch"
-        patch -p1 -d "$WORK_DIR" < "$PATCH_FILE" || {
-            echo -e "- Warning: Standard patch command failed or already applied. Proceeding..."
+        sudo git -C "$TARGET_DIR" apply "$PATCH_FILE" || {
+            echo -e "- Warning: sudo git apply command failed or patch already applied. Proceeding..."
         }
     else
         echo -e "- Patch file not found at $PATCH_FILE. Ensure it is placed correctly."
