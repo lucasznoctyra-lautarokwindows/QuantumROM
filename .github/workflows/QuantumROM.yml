@@ -330,7 +330,7 @@ jobs:
 
       - name: Apply SecSettings Mods
         run: |
-          source "$(pwd)/scripts/SecSettings.sh"
+          source "$(pwd)/scripts/QuantumRom.sh"
 
           if [ "$SETTINGS_MOD" = "true" ]; then
               SETTINGS_MOD "$FIRM_DIR/$TARGET_DEVICE"
