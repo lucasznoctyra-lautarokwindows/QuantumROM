@@ -1118,36 +1118,6 @@ SETTINGS_MOD() {
     echo -e "SecSettings patch done"
 }
 
-
-DISABLE_SIGNATURE_VERIFICATION() {
-    echo " "
-    echo -e "Patch signature verification"
-    echo -e "Authors: ShaDisNX255 / Dai-doz / Al noman"
-
-	if [ "$#" -ne 1 ]; then
-        echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
-        return 1
-    fi
-
-    echo -e "Disabling signature verification."
-	# https://github.com/ShaDisNX255/NcX_Stock/commit/e9fca1cedf2405c9f84dc2ee4aafa018e59de464
-    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773529
-    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773543
-
-    local FILE="${1}/smali_classes4/android/util/apk/ApkSignatureVerifier.smali"
-    # patch .method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I
-    local METHOD_NAME=".method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I"
-    local REPLACE_BODY='
-    .locals 1
-
-    const/4 v0, 0x1
- 
-    return v0
-    '
-	REPLACE_SMALI_METHOD "$FILE" "$METHOD_NAME" "$REPLACE_BODY"
-}
-
-
 PATCH_KNOX_GUARD() {
     echo " "
     echo -e "Patch knox guard"
@@ -1185,6 +1155,88 @@ PATCH_KNOX_GUARD() {
     echo -e "Patch done"
 }
 
+DISABLE_SIGNATURE_VERIFICATION() {
+    echo " "
+    echo -e "Patch signature verification"
+    echo -e "Authors: ShaDisNX255 / Dai-doz / Al noman"
+
+	if [ "$#" -ne 1 ]; then
+        echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
+        return 1
+    fi
+
+    echo -e "Disabling signature verification."
+	# https://github.com/ShaDisNX255/NcX_Stock/commit/e9fca1cedf2405c9f84dc2ee4aafa018e59de464
+    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773529
+    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773543
+
+    local FILE="${1}/smali_classes4/android/util/apk/ApkSignatureVerifier.smali"
+    # patch .method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I
+    local METHOD_NAME=".method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I"
+    local REPLACE_BODY='
+    .locals 1
+
+    const/4 v0, 0x1
+
+    return v0
+    '
+	REPLACE_SMALI_METHOD "$FILE" "$METHOD_NAME" "$REPLACE_BODY"
+}
+
+PATCH_CUSTOM_PLATFORM_SIGNATURE() {
+    echo " "
+    echo -e "Patch framework to allow custom platform signature"
+    echo -e "Authors: Dai-doz / Salvo giangreco / At30c"
+    echo -e "Processing..."
+
+    if [ "$#" -ne 2 ]; then
+        echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY> <SECURITY_DIR>"
+        return 1
+    fi
+
+    local WORK_DIR="$1"
+    local SEC_DIR="$2"
+
+    if [ ! -d "$WORK_DIR" ]; then
+        echo -e "- Directory not found: $WORK_DIR"
+        return 1
+    fi
+
+    local CERT_PREFIX="aosp"
+    [ "${ROM_IS_OFFICIAL:-false}" = "true" ] && CERT_PREFIX="unica"
+
+    local CERT_PEM="$SEC_DIR/${CERT_PREFIX}_platform.x509.pem"
+    if [ ! -f "$CERT_PEM" ]; then
+        echo -e "- File not found: $CERT_PEM"
+        return 1
+    fi
+
+    local PATCH_FILE="$QT_DIR/QuantumROM/patches/signature/services.jar/0001-Allow-custom-platform-signature.patch"
+    if [ -f "$PATCH_FILE" ]; then
+        echo -e "- Applying patch: 0001-Allow-custom-platform-signature.patch"
+        patch -p1 -d "$WORK_DIR" < "$PATCH_FILE" || {
+            echo -e "- Warning: Standard patch command failed or already applied. Proceeding..."
+        }
+    else
+        echo -e "- Patch file not found at $PATCH_FILE. Ensure it is placed correctly."
+    fi
+
+    echo -e "- Extracting certificate signature and replacing placeholder..."
+    local CERT_SIGNATURE
+    CERT_SIGNATURE="$(sed "/CERTIFICATE/d" "$CERT_PEM" | tr -d "\n" | base64 -d | xxd -p -c 0)"
+
+    local TARGET_SMALI="$WORK_DIR/smali_classes2/com/android/server/pm/InstallPackageHelper.smali"
+    if [ -f "$TARGET_SMALI" ]; then
+        # Replace CONFIG_CUSTOM_PLATFORM_SIGNATURE with the hex-encoded certificate signature
+        sed -i "s/CONFIG_CUSTOM_PLATFORM_SIGNATURE/$CERT_SIGNATURE/g" "$TARGET_SMALI"
+        echo -e "- Successfully injected custom platform signature into InstallPackageHelper.smali"
+    else
+        echo -e "- Target smali file not found: $TARGET_SMALI"
+        return 1
+    fi
+
+    echo -e "Patch done"
+}
 
 UPDATE_SDHMS() {
     if [ "$#" -ne 1 ]; then
