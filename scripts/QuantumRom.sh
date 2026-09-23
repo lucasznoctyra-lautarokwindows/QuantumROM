@@ -1008,6 +1008,7 @@ SETTINGS_MOD() {
     local APKTOOL_JAR="${QT_DIR}/bin/java/apktool.jar"
     local FW_DIR="${QT_DIR}/bin/java/apktool/framework"
     local SIGNAPK_JAR="${QT_DIR}/bin/signapk/signapk.jar"
+    local SIGNAPK_BIN="${QT_DIR}/bin/signapk/signapk"
     local CERT_PEM="${QT_DIR}/security/aosp_platform.x509.pem"
     local KEY_PK8="${QT_DIR}/security/aosp_platform.pk8"
     local TAG="ONEUI"
@@ -1097,12 +1098,18 @@ SETTINGS_MOD() {
     java -jar "$APKTOOL_JAR" b -p "$FW_DIR" -o "$WORK_TMP/unsigned.apk" "$WORK_TMP/d"
 
     echo -e "- Signing and replacing SecSettings.apk..."
-    if [ -f "$SIGNAPK_JAR" ] && [ -f "$CERT_PEM" ] && [ -f "$KEY_PK8" ]; then
-        java -jar "$SIGNAPK_JAR" "$CERT_PEM" "$KEY_PK8" \
+    if [ -x "$SIGNAPK_BIN" ] && [ -f "$CERT_PEM" ] && [ -f "$KEY_PK8" ]; then
+        "$SIGNAPK_BIN" "$CERT_PEM" "$KEY_PK8" \
             "$WORK_TMP/unsigned.apk" "$TARGET_DIR/SecSettings.apk"
-        echo -e "Signed and replaced SecSettings.apk in target partition."
+        echo -e "✅ Signed and replaced SecSettings.apk in target partition."
+    elif [ -f "$SIGNAPK_JAR" ] && [ -f "$CERT_PEM" ] && [ -f "$KEY_PK8" ]; then
+        # Fallback to java -cp if signapk binary is not executable/found
+        local SIGNAPK_DIR=$(dirname "$SIGNAPK_JAR")
+        java -cp "${SIGNAPK_DIR}/*" com.android.signapk.SignApk "$CERT_PEM" "$KEY_PK8" \
+            "$WORK_TMP/unsigned.apk" "$TARGET_DIR/SecSettings.apk"
+        echo -e "✅ Signed and replaced SecSettings.apk via java -cp."
     else
-        echo -e "Signing keys missing, replacing with unsigned build directly..."
+        echo -e "⚠️ Signing keys/tools missing, replacing with unsigned build directly..."
         cp -fa "$WORK_TMP/unsigned.apk" "$TARGET_DIR/SecSettings.apk"
     fi
 
