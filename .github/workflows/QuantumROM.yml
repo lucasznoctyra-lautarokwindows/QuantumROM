@@ -5,8 +5,14 @@ on:
     inputs:
       STOCK_DEVICE:
         description: "Your own device model or None"
-        required: true
-        default: "SM-A225F"
+        default: 'None'
+        type: choice
+        options:
+          - None
+          - SM-A127F
+          - SM-A225F
+          - SM-A515F
+          - SM-N985F
 
       USE_UI_8_TETHERING_APEX:
         description: "Set True if your kernel BPF version is 5.4 (lower than 5.10)."
@@ -33,64 +39,100 @@ on:
         default: "erofs"
 
       COMPRESS_IMG_TO_XZ:
-        description: "Compress img to xz (True/False)"
-        required: true
-        default: "False"
+        description: "Compress img to xz"
+        default: 'False'
+        type: choice
+        options:
+          - True
+          - False
 
       PATCH_LIBS:
-        description: "Patch libs for 64bit only ROM (True/False)"
-        required: true
-        default: "False"
+        description: "Patch libs for 64bit only ROM [Convert 64 to 32/64]"
+        default: 'False'
+        type: choice
+        options:
+          - True
+          - False
 
       PATCH_KNOX_GUARD:
-        description: "Patch Knox guard for JDM Devices [3010 ERROR] (True/False)"
-        required: true
-        default: "True"
+        description: "Patch Knox guard for JDM Devices [3010 ERROR]"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       DEBLOAT_ROM:
-        description: "Debloat downloaded rom (True/False)"
-        required: true
-        default: "True"
+        description: "Debloat downloaded rom"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       DEBLOAT_SAMSUNG_BIXBY:
-        description: "Debloat Samsung Bixby apps (True/False)"
-        required: true
-        default: "True"
+        description: "Debloat Samsung Bixby apps"
+        default: 'False'
+        type: choice
+        options:
+          - True
+          - False
 
       DEBLOAT_SAMSUNG_DEX:
-        description: "Debloat Samsung Dex apps (True/False)"
-        required: true
-        default: "True"
+        description: "Debloat Samsung Dex apps"
+        default: 'False'
+        type: choice
+        options:
+          - True
+          - False
 
       ADD_CHINA_SMART_MANAGER:
-        description: "Add china smart manager (True/False)"
-        required: true
-        default: "True"
+        description: "Add china smart manager"
+        default: 'False'
+        type: choice
+        options:
+          - True
+          - False
 
       ADD_SAMSUNG_FLAGSHIP_APPS:
-        description: "Add samsung flagship apps (True/False)"
-        required: true
-        default: "True"
+        description: "Add samsung flagship apps"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       ADD_CUSTOM_FEATURES:
-        description: "Add samsung custom features (True/False)"
-        required: true
-        default: "True"
+        description: "Add samsung custom features"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       PATCH_FLAG_SECURE:
-        description: "Bypass screenshot and screen record detection (True/False)"
-        required: true
-        default: "True"
+        description: "Bypass screenshot and screen record detection"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       PATCH_SECURE_FOLDER:
-        description: "Patch samsung secure folder (True/False)"
-        required: true
-        default: "True"
+        description: "Patch samsung secure folder"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
       PATCH_BLUETOOTH_LIBRARY:
-        description: "Patch bluetooth library (True/False)"
-        required: true
-        default: "True"
+        description: "Patch bluetooth library"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
 
 
 jobs:
