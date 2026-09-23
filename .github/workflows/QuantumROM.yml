@@ -77,6 +77,14 @@ on:
           - True
           - False
 
+      SETTINGS_MOD:
+        description: "Patch SecSettings to have exclusive features [Allow settings mod features Sixteen QRP2 only]"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
+
       DEBLOAT_ROM:
         description: "Debloat downloaded rom"
         default: 'True'
@@ -180,6 +188,7 @@ jobs:
           echo "ADD_CHINA_SMART_MANAGER=${{ inputs.ADD_CHINA_SMART_MANAGER }}" | tee -a "$GITHUB_ENV"
           echo "ADD_SAMSUNG_FLAGSHIP_APPS=${{ inputs.ADD_SAMSUNG_FLAGSHIP_APPS }}" | tee -a "$GITHUB_ENV"
           echo "ADD_CUSTOM_FEATURES=${{ inputs.ADD_CUSTOM_FEATURES }}" | tee -a "$GITHUB_ENV"
+          echo "SETTINGS_MOD=${{ inputs.SETTINGS_MOD }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_KNOX_GUARD=${{ inputs.PATCH_KNOX_GUARD }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_FLAG_SECURE=${{ inputs.PATCH_FLAG_SECURE }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_SECURE_FOLDER=${{ inputs.PATCH_SECURE_FOLDER }}" | tee -a "$GITHUB_ENV"
@@ -317,6 +326,14 @@ jobs:
 
           if [ "$ADD_CUSTOM_FEATURES" = "true" ]; then
               APPLY_CUSTOM_FEATURES "$FIRM_DIR/$TARGET_DEVICE"
+          fi
+
+      - name: Apply SecSettings Mods
+        run: |
+          source "$(pwd)/scripts/SecSettings-mod.sh"
+
+          if [ "$SETTINGS_MOD" = "true" ]; then
+              SETTINGS_MOD "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
       - name: Patch flag secure and secure folder and knox guard
