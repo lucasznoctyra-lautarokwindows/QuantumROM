@@ -321,7 +321,7 @@ jobs:
           fi
 
           if [ "$PATCH_KNOX_GUARD" = "true" ]; then
-              PATCH_KNOX_GUARD "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
+              PATCH_KNOX_GUARD "$WORK_DIR/services"
           fi
 
           if [ "$PATCH_FLAG_SECURE" = "true" ]; then
