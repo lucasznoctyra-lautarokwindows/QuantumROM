@@ -40,7 +40,12 @@ on:
       PATCH_LIBS:
         description: "Patch libs for 64bit only ROM (True/False)"
         required: true
-        default: "false"
+        default: "False"
+
+      PATCH_KNOX_GUARD:
+       description: "Patch Knox guard for JDM Devices [3010 ERROR] (True/False)"
+        required: true
+        default: "True"
 
       DEBLOAT_ROM:
         description: "Debloat downloaded rom (True/False)"
@@ -118,6 +123,7 @@ jobs:
           echo "ADD_CHINA_SMART_MANAGER=${{ inputs.ADD_CHINA_SMART_MANAGER }}" | tee -a "$GITHUB_ENV"
           echo "ADD_SAMSUNG_FLAGSHIP_APPS=${{ inputs.ADD_SAMSUNG_FLAGSHIP_APPS }}" | tee -a "$GITHUB_ENV"
           echo "ADD_CUSTOM_FEATURES=${{ inputs.ADD_CUSTOM_FEATURES }}" | tee -a "$GITHUB_ENV"
+          echo "PATCH_KNOX_GUARD=${{ inputs.PATCH_KNOX_GUARD }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_FLAG_SECURE=${{ inputs.PATCH_FLAG_SECURE }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_SECURE_FOLDER=${{ inputs.PATCH_SECURE_FOLDER }}" | tee -a "$GITHUB_ENV"
           echo "PATCH_BLUETOOTH_LIBRARY=${{ inputs.PATCH_BLUETOOTH_LIBRARY }}" | tee -a "$GITHUB_ENV"
