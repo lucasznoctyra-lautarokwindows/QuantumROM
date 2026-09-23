@@ -1,4 +1,4 @@
-PATCH_SECSETTINGS() {
+SETTINGS_MOD() {
     echo " "
     echo -e "Patch SecSettings"
     echo -e "Authors: Dai-doz / Salvo giangreco"
