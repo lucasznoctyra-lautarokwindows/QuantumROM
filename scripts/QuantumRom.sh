@@ -1167,7 +1167,12 @@ DISABLE_SIGNATURE_VERIFICATION() {
 
     local WORK_DIR="$1"
     local SEC_DIR="$2"
-    local TARGET_DIR="$WORK_DIR/services"
+
+    # Automatically set TARGET_DIR regardless of whether $1 ends with /services or not
+    local TARGET_DIR="$WORK_DIR"
+    if [ -d "$WORK_DIR/services" ]; then
+        TARGET_DIR="$WORK_DIR/services"
+    fi
 
     if [ ! -d "$TARGET_DIR" ]; then
         echo -e "- Directory not found: $TARGET_DIR"
