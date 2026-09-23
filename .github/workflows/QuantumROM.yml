@@ -254,24 +254,31 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$PATCH_LIBS" = "True" ]; then
+          if [ "$PATCH_LIBS" = "true" ]; then
               PATCH_32BIT_HALS "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
+      - name: Patch Knox Guard for JDM devices
+        run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+
+          if [ "$PATCH_KNOX_GUARD" = "true" ]; then
+              PATCH_KNOX_GUARD "$FIRM_DIR/$TARGET_DEVICE"
+          fi
 
       - name: Debloat Rom - ${{ inputs.DEBLOAT_ROM }}
         run: |
           source "$(pwd)/scripts/debloat.sh"
 
-          if [ "$DEBLOAT_ROM" = "True" ]; then
+          if [ "$DEBLOAT_ROM" = "true" ]; then
               DEBLOAT "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
-          if [ "$DEBLOAT_SAMSUNG_BIXBY" = "True" ]; then
+          if [ "$DEBLOAT_SAMSUNG_BIXBY" = "true" ]; then
               KICK "$FIRM_DIR/$TARGET_DEVICE"" "${SAMSUNG_BIXBY_APPS[@]}"
           fi
 
-          if [ "$DEBLOAT_SAMSUNG_DEX" = "True" ]; then
+          if [ "$DEBLOAT_SAMSUNG_DEX" = "true" ]; then
               KICK "$FIRM_DIR/$TARGET_DEVICE"" "${SAMSUNG_DEX_APPS[@]}"
           fi
 
@@ -292,7 +299,7 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$ADD_CHINA_SMART_MANAGER" = "True" ]; then
+          if [ "$ADD_CHINA_SMART_MANAGER" = "true" ]; then
               ADD_CHINA_SMART_MANAGER "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
@@ -300,7 +307,7 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$ADD_SAMSUNG_FLAGSHIP_APPS" = "True" ]; then
+          if [ "$ADD_SAMSUNG_FLAGSHIP_APPS" = "true" ]; then
               ADD_SAMSUNG_FLAGSHIP_APPS "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
@@ -308,7 +315,7 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$ADD_CUSTOM_FEATURES" = "True" ]; then
+          if [ "$ADD_CUSTOM_FEATURES" = "true" ]; then
               APPLY_CUSTOM_FEATURES "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
@@ -316,16 +323,16 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$PATCH_FLAG_SECURE" = "True" ] || [ "$PATCH_SECURE_FOLDER" = "True" ]; then
+          if [ "$PATCH_FLAG_SECURE" = "true" ] || [ "$PATCH_SECURE_FOLDER" = "true" ]; then
               INSTALL_FRAMEWORK "$APKTOOL" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/framework-res.apk"
               DECOMPILE "$APKTOOL" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/services.jar" "$WORK_DIR"
           fi
 
-          if [ "$PATCH_FLAG_SECURE" = "True" ]; then
+          if [ "$PATCH_FLAG_SECURE" = "true" ]; then
               PATCH_FLAG_SECURE "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
           fi
 
-          if [ "$PATCH_SECURE_FOLDER" = "True" ]; then
+          if [ "$PATCH_SECURE_FOLDER" = "true" ]; then
               PATCH_SECURE_FOLDER "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR/services"
           fi
 
@@ -338,7 +345,7 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
 
-          if [ "$PATCH_BLUETOOTH_LIBRARY" = "True" ]; then
+          if [ "$PATCH_BLUETOOTH_LIBRARY" = "true" ]; then
               PATCH_BT_LIB "$FIRM_DIR/$TARGET_DEVICE" "$WORK_DIR"
           fi
 
@@ -359,7 +366,7 @@ jobs:
           ZIP_NAME="${{ inputs.TARGET_DEVICE }}_Port_For_${{ inputs.STOCK_DEVICE }}.zip"
           ZIP_PATH="$OUT_DIR/$ZIP_NAME"
 
-          if [ "$COMPRESS_IMG_TO_XZ" = "True" ]; then
+          if [ "$COMPRESS_IMG_TO_XZ" = "true" ]; then
               echo "Compressing all .img files to .xz (level 9)..."
               for img in "$OUT_DIR"/*.img; do
                   [ -f "$img" ] || continue
