@@ -43,7 +43,7 @@ on:
         default: "False"
 
       PATCH_KNOX_GUARD:
-       description: "Patch Knox guard for JDM Devices [3010 ERROR] (True/False)"
+        description: "Patch Knox guard for JDM Devices [3010 ERROR] (True/False)"
         required: true
         default: "True"
 
