@@ -1,7 +1,7 @@
-![QuantumROM Logo](QuantumROM/logo/QuantumROM.jpg)
+![QuantumROM Logo](QuantumROM/logo/banner.png)
 
 ## 📌 Overview.
-This Custom ROM is built by combining and refining features from multiple projects, including UNICA, Legacy-UI, and AstroRom.
+ProjectDozG is a Custom ROM built by combining and refining features from multiple projects, including UNICA, Legacy-UI, and AstroRom.QuantumROM
 - The goal of this ROM is to provide a clean, optimized, and stable One UI experience with enhanced usability and performance.
 
 ### 🛠️ Tools features.

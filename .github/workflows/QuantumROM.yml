@@ -1,4 +1,4 @@
-name: QuantumROM Tools.
+name: ProjectDozG Builder Tools.
 
 on:
   workflow_dispatch:
@@ -160,7 +160,7 @@ on:
 
 jobs:
   build:
-    name: Start QuantumROM Tools
+    name: Start ProjectDozG build system
     runs-on: ubuntu-22.04
 
     steps:
