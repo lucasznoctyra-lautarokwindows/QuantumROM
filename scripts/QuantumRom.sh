@@ -1157,31 +1157,162 @@ PATCH_KNOX_GUARD() {
 
 DISABLE_SIGNATURE_VERIFICATION() {
     echo " "
-    echo -e "Patch signature verification"
-    echo -e "Authors: ShaDisNX255 / Dai-doz / Al noman"
+    echo -e "Applying Custom Platform Signature Patch & Certificate Injection"
+    echo -e "Authors: Dai-doz / salvo giangreco"
     echo -e "Processing..."
 
-	if [ "$#" -ne 1 ]; then
-        echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"
+    local SERVICES_DIR="$WORK_DIR/services"
+    local INSTALL_HELPER="$SERVICES_DIR/smali_classes2/com/android/server/pm/InstallPackageHelper.smali"
+    local PM_UTILS="$SERVICES_DIR/smali_classes2/com/android/server/pm/PackageManagerServiceUtils.smali"
+    local SCAN_UTILS="$SERVICES_DIR/smali_classes2/com/android/server/pm/ScanPackageUtils.smali"
+
+    if [ ! -d "$SERVICES_DIR" ]; then
+        echo -e "⛔️ Error: Decompiled services directory not found at $SERVICES_DIR"
         return 1
     fi
 
-    echo -e "Disabling signature verification."
-	# https://github.com/ShaDisNX255/NcX_Stock/commit/e9fca1cedf2405c9f84dc2ee4aafa018e59de464
-    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773529
-    # https://forum.xda-developers.com/t/mods-samsung-not-android-mods-collection-exynos.3772017/post-87773543
+    # 1. Integrate customize_2.sh Certificate Logic
+    local CERT_PREFIX="aosp"
+    if [ "${ROM_IS_OFFICIAL:-false}" = "true" ]; then
+        CERT_PREFIX="unica"
+    fi
 
-    local FILE="${1}/smali_classes4/android/util/apk/ApkSignatureVerifier.smali"
-    # patch .method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I
-    local METHOD_NAME=".method public static blacklist getMinimumSignatureSchemeVersionForTargetSdk(I)I"
-    local REPLACE_BODY='
-    .locals 1
+    local CERT_FILE="$(pwd)/security/${CERT_PREFIX}_platform.x509.pem"
+    if [ -f "$CERT_FILE" ]; then
+        echo -e "- Found certificate: ${CERT_PREFIX}_platform.x509.pem"
+        local CERT_SIGNATURE
+        CERT_SIGNATURE="$(sed "/CERTIFICATE/d" "$CERT_FILE" | tr -d "\n" | base64 -d | xxd -p -c 0)"
 
-    const/4 v0, 0x1
+        if [ -n "$CERT_SIGNATURE" ] && [ -f "$INSTALL_HELPER" ] && grep -q "CONFIG_CUSTOM_PLATFORM_SIGNATURE" "$INSTALL_HELPER"; then
+            echo -e "- Injecting certificate signature into InstallPackageHelper.smali..."
+            sed -i "s/CONFIG_CUSTOM_PLATFORM_SIGNATURE/$CERT_SIGNATURE/g" "$INSTALL_HELPER"
+        fi
+    else
+        echo -e "ℹ️ Note: Certificate file not found at $CERT_FILE. Skipping explicit certificate key injection."
+    fi
 
-    return v0
-    '
-	REPLACE_SMALI_METHOD "$FILE" "$METHOD_NAME" "$REPLACE_BODY"
+    # 2. Patch InstallPackageHelper.smali Fields & Methods
+    if [ -f "$INSTALL_HELPER" ]; then
+        echo -e "- Injecting custom signature fields and methods into InstallPackageHelper.smali..."
+
+        # Inject mCustomPlatformSignatures field
+        if ! grep -q "mCustomPlatformSignatures" "$INSTALL_HELPER"; then
+            sed -i '/^\.field public final mAllowAppOps:Ljava\/util\/ArrayList;/a \.field public final mCustomPlatformSignatures:Ljava\/util\/ArrayList;' "$INSTALL_HELPER"
+
+            # Inject field instantiation in constructor
+            sed -i '/iput-object v1, p0, Lcom\/android\/server\/pm\/InstallPackageHelper;->mAllowAppOps:Ljava\/util\/ArrayList;/a \    new-instance v1, Ljava\/util\/ArrayList;\n    invoke-direct {v1}, Ljava\/util\/ArrayList;-><init>()V\n    iput-object v1, p0, Lcom\/android\/server\/pm\/InstallPackageHelper;->mCustomPlatformSignatures:Ljava\/util\/ArrayList;' "$INSTALL_HELPER"
+        fi
+
+        # Inject parseCustomPlatformSignatures method at the end of the file
+        if ! grep -q "parseCustomPlatformSignatures" "$INSTALL_HELPER"; then
+            cat << 'EOF' >> "$INSTALL_HELPER"
+
+.method public parseCustomPlatformSignatures()V
+    .registers 8
+
+    .line 1
+    new-instance v0, Ljava/io/File;
+    const-string v1, "/system/etc/security/custom_platform_signatures.xml"
+    invoke-direct {v0, v1}, Ljava/io/File;-><init>(Ljava/lang/String;)V
+
+    .line 2
+    invoke-virtual {v0}, Ljava/io/File;->exists()Z
+    move-result v1
+    if-nez v1, :cond_c
+
+    return-void
+
+    :cond_c
+    :try_start_c
+    invoke-static {}, Landroid/util/Xml;->newPullParser()Lorg/xmlpull/v1/XmlPullParser;
+
+    move-result-object v1
+
+    .line 3
+    new-instance v2, Ljava/io/FileReader;
+
+    invoke-direct {v2, v0}, Ljava/io/FileReader;-><init>(Ljava/io/File;)V
+
+    invoke-interface {v1, v2}, Lorg/xmlpull/v1/XmlPullParser;->setInput(Ljava/io/Reader;)V
+
+    .line 4
+    invoke-interface {v1}, Lorg/xmlpull/v1/XmlPullParser;->getEventType()I
+
+    move-result v0
+
+    :goto_1d
+    if-eq v0, v2, :cond_52
+
+    const/4 v2, 0x2
+
+    if-ne v0, v2, :cond_4d
+
+    .line 5
+    invoke-interface {v1}, Lorg/xmlpull/v1/XmlPullParser;->getName()Ljava/lang/String;
+
+    move-result-object v0
+
+    const-string v2, "signature"
+
+    .line 6
+    invoke-virtual {v2, v0}, Ljava/lang/String;->equals(Ljava/lang/Object;)Z
+
+    move-result v0
+
+    if-eqz v0, :cond_4d
+
+    const-string v0, "key"
+
+    const/4 v2, 0x0
+
+    .line 7
+    invoke-interface {v1, v2, v0}, Lorg/xmlpull/v1/XmlPullParser;->getAttributeValue(Ljava/lang/String;Ljava/lang/String;)Ljava/lang/String;
+
+    move-result-object v0
+
+    if-eqz v0, :cond_4d
+
+    .line 8
+    iget-object v2, p0, Lcom/android/server/pm/InstallPackageHelper;->mCustomPlatformSignatures:Ljava/util/ArrayList;
+
+    new-instance v3, Landroid/content/pm/Signature;
+
+    invoke-direct {v3, v0}, Landroid/content/pm/Signature;-><init>(Ljava/lang/String;)V
+
+    invoke-virtual {v2, v3}, Ljava/util/ArrayList;->add(Ljava/lang/Object;)Z
+
+    .line 9
+    :cond_4d
+    invoke-interface {v1}, Lorg/xmlpull/v1/XmlPullParser;->next()I
+
+    move-result v0
+    goto :goto_1d
+    :try_end_52
+    .catch Ljava/lang/Exception; -0x52
+    :cond_52
+    return-void
+.end method
+EOF
+        fi
+
+        # Pass InstallPackageHelper instance to signature checking calls
+        sed -i 's/invoke-static {v0, p1}/invoke-static {v0, p1, p0}/g' "$INSTALL_HELPER"
+    fi
+
+    # 3. Patch PackageManagerServiceUtils.smali
+    if [ -f "$PM_UTILS" ]; then
+        echo -e "- Updating compareSignatures in PackageManagerServiceUtils.smali..."
+        sed -i 's/\.method public static compareSignatures(\[Landroid\/content\/pm\/Signature;\[Landroid\/content\/pm\/Signature;)I/\.method public static compareSignatures(\[Landroid\/content\/pm\/Signature;\[Landroid\/content\/pm\/Signature;Lcom\/android\/server\/pm\/InstallPackageHelper;)I/g' "$PM_UTILS"
+    fi
+
+    # 4. Patch ScanPackageUtils.smali
+    if [ -f "$SCAN_UTILS" ]; then
+        echo -e "- Updating compareSignatures calls in ScanPackageUtils.smali..."
+        sed -i 's/invoke-static {v1, v0}/invoke-static {v1, v0, p1}/g' "$SCAN_UTILS"
+    fi
+
+    unset CERT_PREFIX CERT_SIGNATURE
+    echo -e "Custom Platform Signature Patch & Certificate Injection fully completed."
 }
 
 PATCH_CUSTOM_PLATFORM_SIGNATURE() {
