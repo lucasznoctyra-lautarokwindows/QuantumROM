@@ -1182,7 +1182,7 @@ DISABLE_SIGNATURE_VERIFICATION() {
         return 1
     fi
 
-    local PATCH_FILE="$QT_DIR/QuantumROM/Mods/services.jar/0001-Allow-custom-platform-signature.patch"
+    local PATCH_FILE="$QT_DIR/QuantumROM/patches/signature/services.jar/0001-Allow-custom-platform-signature.patch"
     if [ -f "$PATCH_FILE" ]; then
         echo -e "- Applying patch: 0001-Allow-custom-platform-signature.patch"
         patch -p1 -d "$WORK_DIR" < "$PATCH_FILE" || {
