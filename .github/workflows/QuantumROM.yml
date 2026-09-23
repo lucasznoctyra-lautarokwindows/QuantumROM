@@ -357,7 +357,7 @@ jobs:
           fi
 
           if [ "$DISABLE_SIGNATURE_VERIFICATION" = "true" ]; then
-              DISABLE_SIGNATURE_VERIFICATION "$WORK_DIR/services"
+              DISABLE_SIGNATURE_VERIFICATION "$WORK_DIR/services" "$QT_DIR/security"
           fi
 
           if [ "$PATCH_FLAG_SECURE" = "true" ]; then
