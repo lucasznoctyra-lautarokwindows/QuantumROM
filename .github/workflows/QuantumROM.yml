@@ -62,7 +62,7 @@ on:
           - False
 
       USE_UI_8_TETHERING_APEX:
-        description: "Patch netbpfloader for 5.4 bpf kernel [sixteen QEP2 need 5.10bpf+]."
+        description: "Patch netbpfloader for 5.4 bpf kernel [sixteen QRP2 need 5.10bpf+]."
         default: 'False'
         type: choice
         options:
