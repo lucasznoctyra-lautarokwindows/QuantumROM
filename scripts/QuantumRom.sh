@@ -1035,20 +1035,15 @@ SETTINGS_MOD() {
     java -jar "$APKTOOL_JAR" d -f -p "$FW_DIR" -t "$TAG" -o "$WORK_TMP/d" "$INPUT_APK"
 
     echo -e "- Copying modded smali and assets..."
-    if [ -d "$MOD_DIR" ]; then
-        [ -d "$MOD_DIR/smali" ] && mkdir -p "$WORK_TMP/d/smali" && cp -a "$MOD_DIR/smali/." "$WORK_TMP/d/smali/"
-        [ -d "$MOD_DIR/smali_classes2" ] && mkdir -p "$WORK_TMP/d/smali_classes2" && cp -a "$MOD_DIR/smali_classes2/." "$WORK_TMP/d/smali_classes2/"
-        [ -d "$MOD_DIR/smali_classes4" ] && mkdir -p "$WORK_TMP/d/smali_classes4" && cp -a "$MOD_DIR/smali_classes4/." "$WORK_TMP/d/smali_classes4/"
-        [ -d "$MOD_DIR/smali_classes5" ] && mkdir -p "$WORK_TMP/d/smali_classes5" && cp -a "$MOD_DIR/smali_classes5/." "$WORK_TMP/d/smali_classes5/"
+    [ -d "$MOD_DIR/smali" ] && cp -a "$MOD_DIR/smali/." "$WORK_TMP/d/smali/"
+    [ -d "$MOD_DIR/smali_classes2" ] && cp -a "$MOD_DIR/smali_classes2/." "$WORK_TMP/d/smali_classes2/"
+    [ -d "$MOD_DIR/smali_classes4" ] && cp -a "$MOD_DIR/smali_classes4/." "$WORK_TMP/d/smali_classes4/"
+    [ -d "$MOD_DIR/smali_classes5" ] && cp -a "$MOD_DIR/smali_classes5/." "$WORK_TMP/d/smali_classes5/"
 
-        for d in layout drawable drawable-nodpi; do
-            [ -d "$MOD_DIR/res/$d" ] && mkdir -p "$WORK_TMP/d/res/$d" && cp -a "$MOD_DIR/res/$d/." "$WORK_TMP/d/res/$d/"
-        done
-    else
-        echo -e "⚠️ Mod directory $MOD_DIR not found, skipping smali copy..."
-    fi
+    for d in layout drawable drawable-nodpi; do
+        [ -d "$MOD_DIR/res/$d" ] && cp -a "$MOD_DIR/res/$d/." "$WORK_TMP/d/res/$d/"
+    done
 
-    mkdir -p "$WORK_TMP/d/res/xml"
     cp "$MOD_DIR/res/xml/unica_top_settings.xml" \
        "$MOD_DIR/res/xml/unica_extra_settings.xml" \
        "$MOD_DIR/res/xml/unica_ui_settings.xml" "$WORK_TMP/d/res/xml/" 2>/dev/null || true
