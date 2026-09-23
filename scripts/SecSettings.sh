@@ -73,10 +73,11 @@ SETTINGS_MOD() {
         }' "$WORK_TMP/d/res/xml/sec_top_level_settings.xml"
     fi
 
-    echo -e "- Merging resources and translations..."
+ echo -e "- Merging resources and translations..."
     for f in "$MOD_DIR"/res/values/*.xml; do
         [ -f "$f" ] || continue
         n=$(basename "$f")
+        [ ! -f "$WORK_TMP/d/res/values/$n" ] && continue
         sed -e '/?xml/d' -e '/<\/\?resources>/d' "$f" > "$WORK_TMP/e_$n"
         sed -i '/<\/resources>/{
             r '"$WORK_TMP/e_$n"'
@@ -88,13 +89,16 @@ SETTINGS_MOD() {
     for dir in "$MOD_DIR"/res/values-*; do
         [ -d "$dir" ] || continue
         loc=$(basename "$dir")
-        [ ! -f "$WORK_TMP/d/res/$loc/strings.xml" ] && continue
-        sed -e '/?xml/d' -e '/<\/\?resources>/d' "$dir/strings.xml" > "$WORK_TMP/e_$loc"
-        sed -i '/<\/resources>/{
-            r '"$WORK_TMP/e_$loc"'
-            a\</resources>
-            d
-        }' "$WORK_TMP/d/res/values/$loc/strings.xml"
+
+        # Chỉ chạy sed nếu file strings.xml ĐÃ TỒN TẠI ở cả thư mục gốc và thư mục mod
+        if [ -f "$WORK_TMP/d/res/$loc/strings.xml" ] && [ -f "$dir/strings.xml" ]; then
+            sed -e '/?xml/d' -e '/<\/\?resources>/d' "$dir/strings.xml" > "$WORK_TMP/e_$loc"
+            sed -i '/<\/resources>/{
+                r '"$WORK_TMP/e_$loc"'
+                a\</resources>
+                d
+            }' "$WORK_TMP/d/res/$loc/strings.xml"
+        fi
     done
 
     echo -e "- Recompiling SecSettings.apk..."
