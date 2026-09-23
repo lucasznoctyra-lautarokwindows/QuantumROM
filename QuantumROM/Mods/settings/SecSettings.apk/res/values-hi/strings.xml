@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">एप्लीकेशन को पिछले वर्जन पे जाने की अनुमति दे</string>
+    <string name="unica_allow_sdkbypass_title">लौ टारगेट SDK ब्लॉक को बंद करे</string>
+    <string name="unica_asks_title">ASKS को बंद करे </string>
+    <string name="unica_boot_sound_title">पावर ऑन करते वक्त आवाज़ चालू करे</string>
+    <string name="unica_device_name_title">डिवाइस का नाम</string>
+    <string name="unica_dialog_reboot_msg">आपके किया हुए सेटिंग्स को सेव करने के लिए रिस्टार्ट कीजिए।</string>
+    <string name="unica_dialog_reboot_negative">अभी नहीं</string>
+    <string name="unica_dialog_reboot_positive">रीस्टार्ट </string>
+    <string name="unica_dialog_reboot_title">रीस्टार्ट करना पड़ेगा</string>
+    <string name="unica_extra_settings_title">और सेटिंग्स देखिए</string>
+    <string name="unica_games_spoof_title">गेम्स में जादा FPS अनलॉक करे</string>
+    <string name="unica_gphotos_title">गूगल फोटोज पे अनलिमिटेड स्टोरेज</string>
+    <string name="unica_launcher_anim_type_title">लॉन्चर एनीमेशन टाइप</string>
+    <string name="unica_max_refresh_rate_title">रीफ़्रेश दर को सबसे ज़्यादा पर सेट करें</string>
+    <string name="unica_menu_item_reboot_download_title">डाउनलोड में रीस्टार्ट करें</string>
+    <string name="unica_menu_item_reboot_fastboot_title">फास्टबूट में रीस्टार्ट करें</string>
+    <string name="unica_menu_item_reboot_recovery_title">रिकवरी में रीस्टार्ट करें</string>
+    <string name="unica_menu_item_reboot_title">रीस्टार्ट</string>
+    <string name="unica_menu_reboot_title">रीस्टार्ट करने के विकल्प</string>
+    <string name="unica_native_blur_title">लाइव ब्लर प्रभाव सक्षम करें</string>
+    <string name="unica_rom_version_title">ROM संस्करण</string>
+    <string name="unica_secure_ss_title">सुरक्षित स्क्रीनशॉट की अनुमति दें</string>
+    <string name="unica_settings_title">ProjectDozG सेटिंग</string>
+    <string name="unica_ss_detection_title">स्क्रीन कैप्चर पहचान अक्षम करें</string>
+    <string name="unica_ui_settings_title">यूआई सेटिंग</string>
+    <string name="unica_vulkan_summary">यह अस्थिर है और इससे समस्याएं उत्पन्न हो सकती हैं!</string>
+    <string name="unica_vulkan_title">वल्कन रेंडरर सक्षम करें</string>
+</resources>

@@ -993,6 +993,8 @@ PATCH_PRIVATE_SHARE() {
 
 DISABLE_SIGNATURE_VERIFICATION() {
     echo " "
+    echo -e "Patch signature verification"
+    echo -e "Authors: ShaDisNX255 / Dai-doz / Al noman"
 
 	if [ "$#" -ne 1 ]; then
         echo -e "Usage: ${FUNCNAME[0]} <EXTRACTED_SERVICES_DIRECTORY>"

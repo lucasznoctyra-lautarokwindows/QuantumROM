@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">"Autoriser la rétrogradation d'application"</string>
+    <string name="unica_allow_sdkbypass_title">Désactiver le blocage des SDK à cible basse</string>
+    <string name="unica_asks_title">Désactiver ASKS</string>
+    <string name="unica_boot_sound_title">"Jouer l'effet sonore au démarrage"</string>
+    <string name="unica_device_name_title">"Nom de l'appareil"</string>
+    <string name="unica_dialog_reboot_msg">"Pour appliquer les modifications, un redémarrage de l'appareil est requis."</string>
+    <string name="unica_dialog_reboot_negative">Pas maintenant</string>
+    <string name="unica_dialog_reboot_positive">Redémarrage</string>
+    <string name="unica_dialog_reboot_title">Redémarrage requis</string>
+    <string name="unica_extra_settings_title">Paramètres supplémentaires</string>
+    <string name="unica_games_spoof_title">Débloquez des FPS plus élevés dans les jeux</string>
+    <string name="unica_gphotos_title">Stockage illimité sur Google Photos</string>
+    <string name="unica_launcher_anim_type_title">"Type d'animation du lanceur"</string>
+    <string name="unica_max_refresh_rate_title">Forcer le taux de rafraîchissement maximal</string>
+    <string name="unica_menu_item_reboot_download_title">Redémarrer en mode Download</string>
+    <string name="unica_menu_item_reboot_fastboot_title">Redémarrer en mode Fastboot</string>
+    <string name="unica_menu_item_reboot_recovery_title">Redémarrer en mode Recovery</string>
+    <string name="unica_menu_item_reboot_title">Redémarrer</string>
+    <string name="unica_menu_reboot_title">Options de redémarrage</string>
+    <string name="unica_native_blur_title">"Activer l'effet de flou en direct"</string>
+    <string name="unica_rom_version_title">Version de la ROM</string>
+    <string name="unica_secure_ss_title">"Autoriser la capture d'écran sécurisée"</string>
+    <string name="unica_settings_title">Paramètres ProjectDozG</string>
+    <string name="unica_ss_detection_title">"Désactiver la détection de capture d'écran"</string>
+    <string name="unica_ui_settings_title">"Paramètres de l'interface utilisateur"</string>
+    <string name="unica_vulkan_summary">Ceci est instable et pourrait causer des problèmes !</string>
+    <string name="unica_vulkan_title">Activer le moteur de rendu Vulkan</string>
+</resources>

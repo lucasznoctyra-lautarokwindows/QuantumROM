@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">السماح للتطبيق بالرجوع إلى إصدار أقدم</string>
+    <string name="unica_allow_sdkbypass_title">إيقاف الحظر لإصدار SDK المنخفض</string>
+    <string name="unica_asks_title">تعطيل ASKS</string>
+    <string name="unica_boot_sound_title">تفعيل صوت الإقلاع</string>
+    <string name="unica_device_name_title">اسم الجهاز</string>
+    <string name="unica_dialog_reboot_msg">لتطبيق التغييرات، يلزم إعادة تشغيل الهاتف.</string>
+    <string name="unica_dialog_reboot_negative">ليس الآن</string>
+    <string name="unica_dialog_reboot_positive">إعادة تشغيل</string>
+    <string name="unica_dialog_reboot_title">مطلوب إعادة تشغيل الهاتف</string>
+    <string name="unica_extra_settings_title">إعدادات إضافية</string>
+    <string name="unica_games_spoof_title">فتح معدل تحديث أعلى في الألعاب</string>
+    <string name="unica_gphotos_title">مساحة تخزين غير محدودة على صور Google</string>
+    <string name="unica_launcher_anim_type_title">نوع الرسوم المتحركة للمشغل</string>
+    <string name="unica_max_refresh_rate_title">فرض الحد الأقصى لمعدل تحديث الشاشة</string>
+    <string name="unica_menu_item_reboot_download_title">إعادة التشغيل إلى وضع التحميل</string>
+    <string name="unica_menu_item_reboot_fastboot_title">إعادة التشغيل إلى وضع الفاستبوت</string>
+    <string name="unica_menu_item_reboot_recovery_title">إعادة التشغيل إلى وضع الاسترداد</string>
+    <string name="unica_menu_item_reboot_title">إعادة التشغيل</string>
+    <string name="unica_menu_reboot_title">خيارات إعادة التشغيل</string>
+    <string name="unica_native_blur_title">تفعيل تأثير الضباب المباشر</string>
+    <string name="unica_rom_version_title">إصدار الروم</string>
+    <string name="unica_secure_ss_title">السماح بالتقاط صورة شاشة آمنة</string>
+    <string name="unica_settings_title">إعدادات ProjectDozG</string>
+    <string name="unica_ss_detection_title">تعطيل اكتشاف أخذ لقطات الشاشة</string>
+    <string name="unica_ui_settings_title">إعدادات واجهة المستخدم</string>
+    <string name="unica_vulkan_summary">هذا غير مستقر وقد يسبب مشاكل!</string>
+    <string name="unica_vulkan_title">تمكين عرض Vulkan</string>
+</resources>

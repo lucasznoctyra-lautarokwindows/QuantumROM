@@ -61,6 +61,14 @@ on:
           - True
           - False
 
+      DISABLE_SIGNATURE_VERIFICATION:
+        description: "Patch disable signature verification [Allow settings mod features]"
+        default: 'True'
+        type: choice
+        options:
+          - True
+          - False
+
       USE_UI_8_TETHERING_APEX:
         description: "Patch netbpfloader for 5.4 bpf kernel [sixteen QRP2 need 5.10bpf+]."
         default: 'False'
@@ -322,6 +330,10 @@ jobs:
 
           if [ "$PATCH_KNOX_GUARD" = "true" ]; then
               PATCH_KNOX_GUARD "$WORK_DIR/services"
+          fi
+
+          if [ "$DISABLE_SIGNATURE_VERIFICATION" = "true" ]; then
+              DISABLE_SIGNATURE_VERIFICATION "$WORK_DIR/services"
           fi
 
           if [ "$PATCH_FLAG_SECURE" = "true" ]; then

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">允许应用降级安装</string>
+    <string name="unica_allow_sdkbypass_title">允许安装低SDK版本应用</string>
+    <string name="unica_asks_title">禁用ASKS</string>
+    <string name="unica_boot_sound_title">开机音效</string>
+    <string name="unica_device_name_title">设备名称</string>
+    <string name="unica_dialog_reboot_msg">应用这些更改，需要重新启动。</string>
+    <string name="unica_dialog_reboot_negative">现在不</string>
+    <string name="unica_dialog_reboot_positive">重启</string>
+    <string name="unica_dialog_reboot_title">需要重启</string>
+    <string name="unica_extra_settings_title">更多设置</string>
+    <string name="unica_games_spoof_title">解锁游戏FPS</string>
+    <string name="unica_gphotos_title">Google相册无限备份</string>
+    <string name="unica_launcher_anim_type_title">桌面动画类型</string>
+    <string name="unica_max_refresh_rate_title">强制使用高刷新率</string>
+    <string name="unica_menu_item_reboot_download_title">重启到Download</string>
+    <string name="unica_menu_item_reboot_fastboot_title">重启到Fastboot</string>
+    <string name="unica_menu_item_reboot_recovery_title">重启到Recovery</string>
+    <string name="unica_menu_item_reboot_title">重启</string>
+    <string name="unica_menu_reboot_title">重启选项</string>
+    <string name="unica_native_blur_title">启用实时模糊</string>
+    <string name="unica_rom_version_title">ROM版本</string>
+    <string name="unica_secure_ss_title">强制截屏</string>
+    <string name="unica_settings_title">ProjectDozG设置</string>
+    <string name="unica_ss_detection_title">禁用屏幕截图检测</string>
+    <string name="unica_ui_settings_title">界面设置</string>
+    <string name="unica_vulkan_summary">此功能不稳定，可能会导致问题！</string>
+    <string name="unica_vulkan_title">启用 Vulkan 渲染器</string>
+</resources>

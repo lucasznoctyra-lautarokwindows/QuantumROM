@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">Dozvoli instaliranje niže verzije aplikacije</string>
+    <string name="unica_allow_sdkbypass_title">Isključi blokiranje niže verzije SDK</string>
+    <string name="unica_asks_title">Isključi ASKS</string>
+    <string name="unica_boot_sound_title">Reproduciraj zvučni efekat paljenja</string>
+    <string name="unica_device_name_title">Ime uređaja</string>
+    <string name="unica_dialog_reboot_msg">Da bi primijenili promjene, potrebno je ponovno pokrenuti.</string>
+    <string name="unica_dialog_reboot_negative">Ne sada</string>
+    <string name="unica_dialog_reboot_positive">Ponovno pokreni</string>
+    <string name="unica_dialog_reboot_title">Potrebno ponovno pokretanje</string>
+    <string name="unica_extra_settings_title">Dodatne postavke</string>
+    <string name="unica_games_spoof_title">Otključaj veći FPS u igrama</string>
+    <string name="unica_gphotos_title">Beskonačno memorije u Google Fotografijama</string>
+    <string name="unica_launcher_anim_type_title">Vrsta animacije pokretača</string>
+    <string name="unica_max_refresh_rate_title">Prisili vršnu brzinu osvježavanja</string>
+    <string name="unica_menu_item_reboot_download_title">Ponovno pokreni u Download</string>
+    <string name="unica_menu_item_reboot_fastboot_title">Ponovno pokreni u Fastboot</string>
+    <string name="unica_menu_item_reboot_recovery_title">Ponovno pokreni u način rada za oporavak</string>
+    <string name="unica_menu_item_reboot_title">Ponovno pokreni</string>
+    <string name="unica_menu_reboot_title">Opcije ponovnog pokretanja</string>
+    <string name="unica_native_blur_title">Uključi efekat živog zamućenja</string>
+    <string name="unica_rom_version_title">Verzija ROM-a</string>
+    <string name="unica_secure_ss_title">Dozvoli sigurni snimak ekrana</string>
+    <string name="unica_settings_title">ProjectDozG Postavke</string>
+    <string name="unica_ss_detection_title">Isključi detekciju snimka ekrana</string>
+    <string name="unica_ui_settings_title">UI postavke</string>
+    <string name="unica_vulkan_summary">Ovo je nestabilno i može prouzrokovati probleme!</string>
+    <string name="unica_vulkan_title">Uključi Vulkan renderer</string>
+</resources>

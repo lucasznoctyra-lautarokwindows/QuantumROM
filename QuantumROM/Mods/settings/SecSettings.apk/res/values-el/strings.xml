@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">Επιτρέπεται η υποβάθμιση εφαρμογών</string>
+    <string name="unica_allow_sdkbypass_title">Απενεργοποίηση αποκλεισμού χαμηλού Target SDK</string>
+    <string name="unica_asks_title">Απενεργοποίηση ASKS</string>
+    <string name="unica_boot_sound_title">Αναπαραγωγή ήχου εκκίνησης</string>
+    <string name="unica_device_name_title">Όνομα συσκευής</string>
+    <string name="unica_dialog_reboot_msg">Για να εφαρμοστούν οι αλλαγές, απαιτείται επανεκκίνηση.</string>
+    <string name="unica_dialog_reboot_negative">Όχι τώρα</string>
+    <string name="unica_dialog_reboot_positive">Επανεκκίνηση</string>
+    <string name="unica_dialog_reboot_title">Απαιτείται επανεκκίνηση</string>
+    <string name="unica_extra_settings_title">Πρόσθετες ρυθμίσεις</string>
+    <string name="unica_games_spoof_title">Ξεκλείδωμα υψηλότερου FPS στα παιχνίδια</string>
+    <string name="unica_gphotos_title">Απεριόριστος αποθηκευτικός χώρος στο Google Photos</string>
+    <string name="unica_launcher_anim_type_title">Τύπος animation του Launcher</string>
+    <string name="unica_max_refresh_rate_title">Εξαναγκασμός μέγιστου ρυθμού ανανέωσης</string>
+    <string name="unica_menu_item_reboot_download_title">Επανεκκίνηση σε Download</string>
+    <string name="unica_menu_item_reboot_fastboot_title">Επανεκκίνηση σε Fastboot</string>
+    <string name="unica_menu_item_reboot_recovery_title">Επανεκκίνηση σε Recovery</string>
+    <string name="unica_menu_item_reboot_title">Επανεκκίνηση</string>
+    <string name="unica_menu_reboot_title">Επιλογές επανεκκίνησης</string>
+    <string name="unica_native_blur_title">Ενεργοποίηση ζωντανού εφέ θόλωσης</string>
+    <string name="unica_rom_version_title">Έκδοση ROM</string>
+    <string name="unica_secure_ss_title">Επιτρέπεται το ασφαλές στιγμιότυπο οθόνης</string>
+    <string name="unica_settings_title">Ρυθμίσεις ProjectDozG</string>
+    <string name="unica_ss_detection_title">Απενεργοποίηση ανίχνευσης στιγμιότυπου οθόνης</string>
+    <string name="unica_ui_settings_title">Ρυθμίσεις διεπαφής</string>
+    <string name="unica_vulkan_summary">Αυτή η επιλογή είναι ασταθής και μπορεί να προκαλέσει προβλήματα!</string>
+    <string name="unica_vulkan_title">Ενεργοποίηση Vulkan renderer</string>
+</resources>

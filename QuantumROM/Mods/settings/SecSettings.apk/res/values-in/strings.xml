@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">Izinkan penurunan versi aplikasi</string>
+    <string name="unica_allow_sdkbypass_title">Non-aktifkan low target SDK block</string>
+    <string name="unica_asks_title">Non-aktifkan ASKS</string>
+    <string name="unica_boot_sound_title">Aktifkan suara saat dihidupkan</string>
+    <string name="unica_device_name_title">Nama Perangkat</string>
+    <string name="unica_dialog_reboot_msg">Untuk menerapkan perubahan, diperlukan memulai ulang.</string>
+    <string name="unica_dialog_reboot_negative">Tidak sekarang</string>
+    <string name="unica_dialog_reboot_positive">Mulai ulang</string>
+    <string name="unica_dialog_reboot_title">Mulai ulang diperlukan</string>
+    <string name="unica_extra_settings_title">Pengaturan ekstra</string>
+    <string name="unica_games_spoof_title">Buka FPS lebih tinggi dalam gim</string>
+    <string name="unica_gphotos_title">Penyimpanan tak terbatas di Google Foto</string>
+    <string name="unica_launcher_anim_type_title">Jenis animasi peluncur</string>
+    <string name="unica_max_refresh_rate_title">Paksa penyegaran layar tinggi</string>
+    <string name="unica_menu_item_reboot_download_title">Mulai ulang ke Download</string>
+    <string name="unica_menu_item_reboot_fastboot_title">Mulai ulang ke Fastboot</string>
+    <string name="unica_menu_item_reboot_recovery_title">Mulai ulang ke Recovery</string>
+    <string name="unica_menu_item_reboot_title">Mulai ulang</string>
+    <string name="unica_menu_reboot_title">Opsi mulai ulang</string>
+    <string name="unica_native_blur_title">Aktifkan efek live blur</string>
+    <string name="unica_rom_version_title">Versi ROM</string>
+    <string name="unica_secure_ss_title">Izinkan tangkapan layar aman</string>
+    <string name="unica_settings_title">Pengaturan ProjectDozG</string>
+    <string name="unica_ss_detection_title">Matikan deteksi tangkapan layar</string>
+    <string name="unica_ui_settings_title">Pengaturan UI</string>
+    <string name="unica_vulkan_summary">Ini tidak stabil dan mungkin menyebabkan masalah!</string>
+    <string name="unica_vulkan_title">Aktifkan perender Vulkan</string>
+</resources>

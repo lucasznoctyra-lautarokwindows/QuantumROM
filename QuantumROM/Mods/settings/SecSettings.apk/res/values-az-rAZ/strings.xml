@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="unica_allow_downgrade_title">Tətbiq versiyasının aşağı salınmasına icazə ver</string>
+    <string name="unica_allow_sdkbypass_title">Tətbiqlərdə SDK versiya məhdudiyyətini deaktiv et</string>
+    <string name="unica_asks_title">ASKS-i deaktiv et</string>
+    <string name="unica_boot_sound_title">Telefonu başladarkən səs effektini çal</string>
+    <string name="unica_device_name_title">Cihaz adı</string>
+    <string name="unica_dialog_reboot_msg">Dəyişiklikləri tətbiq etmək üçün yenidən başlatma tələb olunur.</string>
+    <string name="unica_dialog_reboot_negative">İndi yox</string>
+    <string name="unica_dialog_reboot_positive">Yenidən başlat</string>
+    <string name="unica_dialog_reboot_title">Yenidən başlatma tələb olunur</string>
+    <string name="unica_extra_settings_title">Əlavə parametrlər</string>
+    <string name="unica_games_spoof_title">Oyunlarda daha yüksək FPS kilidini aç</string>
+    <string name="unica_gphotos_title">Google Photos-da limitsiz yaddaş</string>
+    <string name="unica_launcher_anim_type_title">Launcher animasiyasının tipi</string>
+    <string name="unica_max_refresh_rate_title">Ən yüksək yeniləmə tezliyinə məcbur et</string>
+    <string name="unica_menu_item_reboot_download_title">Yükləmə rejimində yenidən başladın</string>
+    <string name="unica_menu_item_reboot_fastboot_title">Fastboot rejimində yenidən başladın</string>
+    <string name="unica_menu_item_reboot_recovery_title">Bərpa rejimində yenidən başladın</string>
+    <string name="unica_menu_item_reboot_title">Yenidən başlat</string>
+    <string name="unica_menu_reboot_title">Yenidən başlatma seçimləri</string>
+    <string name="unica_native_blur_title">Canlı blur effektini aktivləşdir</string>
+    <string name="unica_rom_version_title">ROM versiyası</string>
+    <string name="unica_secure_ss_title">Təhlükəsiz ekran görüntüsünə icazə ver</string>
+    <string name="unica_settings_title">ProjectDozG Parametrləri</string>
+    <string name="unica_ss_detection_title">Ekran görüntüsü aşkarlanmasını deaktiv et</string>
+    <string name="unica_ui_settings_title">İstifadəçi interfeysi parametrləri</string>
+    <string name="unica_vulkan_summary">Bu stabil deyil və problemlərə səbəb ola bilər!</string>
+    <string name="unica_vulkan_title">Vulkan renderini aktiv et</string>
+</resources>
