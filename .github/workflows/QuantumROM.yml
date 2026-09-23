@@ -258,14 +258,6 @@ jobs:
               PATCH_32BIT_HALS "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
-      - name: Patch Knox Guard for JDM devices
-        run: |
-          source "$(pwd)/scripts/QuantumRom.sh"
-
-          if [ "$PATCH_KNOX_GUARD" = "true" ]; then
-              PATCH_KNOX_GUARD "$FIRM_DIR/$TARGET_DEVICE"
-          fi
-
       - name: Debloat Rom - ${{ inputs.DEBLOAT_ROM }}
         run: |
           source "$(pwd)/scripts/debloat.sh"
@@ -339,6 +331,14 @@ jobs:
           if [ -f "$WORK_DIR/services.jar" ]; then
               mv -f "$WORK_DIR/services.jar" "$FIRM_DIR/$TARGET_DEVICE/system/system/framework/"
               echo "✅ services.jar moved to rom."
+          fi
+
+      - name: Patch Knox Guard for JDM devices
+        run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+
+          if [ "$PATCH_KNOX_GUARD" = "true" ]; then
+              PATCH_KNOX_GUARD "$FIRM_DIR/$TARGET_DEVICE"
           fi
 
       - name: Patch bluetooth library- ${{ inputs.PATCH_BLUETOOTH_LIBRARY }}
