@@ -2974,36 +2974,41 @@ BUILD_IMG() {
 
     build_img() {
         local PARTITION="$1"
-
-        mkdir -p "${EXTRACTED_FIRM_DIR}/${PARTITION}/lost+found"
-
-        GEN_FS_CONFIG "$EXTRACTED_FIRM_DIR" "$PARTITION"
-        GEN_FILE_CONTEXTS "$EXTRACTED_FIRM_DIR" "$PARTITION"
-
         local SOURCE_DIR="${EXTRACTED_FIRM_DIR}/$PARTITION"
         local OUT_IMG="$OUT_DIR/${PARTITION}.img"
         local FS_CONFIG="${EXTRACTED_FIRM_DIR}/config/${PARTITION}_fs_config"
         local FILE_CONTEXTS="${EXTRACTED_FIRM_DIR}/config/${PARTITION}_file_contexts"
+        local MOUNT_POINT="/$PARTITION"
 
         [[ -d "$SOURCE_DIR" ]] || return
 
+        if [ "$PARTITION" = "vendor" ] && [ -f "$FS_CONFIG" ] && [ -f "$FILE_CONTEXTS" ]; then
+            echo "=============================================="
+            echo " Packing vendor directly as-is (no modifying) "
+            echo "=============================================="
+        else
+            mkdir -p "${EXTRACTED_FIRM_DIR}/${PARTITION}/lost+found"
+
+            GEN_FS_CONFIG "$EXTRACTED_FIRM_DIR" "$PARTITION"
+            GEN_FILE_CONTEXTS "$EXTRACTED_FIRM_DIR" "$PARTITION"
+
+            [[ -f "$FS_CONFIG" ]] || {
+                echo -e "Warning: $FS_CONFIG missing, skipping $PARTITION"
+                return
+            }
+
+            [[ -f "$FILE_CONTEXTS" ]] || {
+                echo -e "Warning: $FILE_CONTEXTS missing, skipping $PARTITION"
+                return
+            }
+
+            sort -u "$FILE_CONTEXTS" -o "$FILE_CONTEXTS"
+            sort -u "$FS_CONFIG" -o "$FS_CONFIG"
+        fi
+
         local EXTRACTED_SIZE=$(du -sb --apparent-size "$SOURCE_DIR" | cut -f1)
-        local MOUNT_POINT="/$PARTITION"
 
         rm -rf "$OUT_IMG"
-
-        [[ -f "$FS_CONFIG" ]] || {
-            echo -e "Warning: $FS_CONFIG missing, skipping $PARTITION"
-            return
-        }
-
-        [[ -f "$FILE_CONTEXTS" ]] || {
-            echo -e "Warning: $FILE_CONTEXTS missing, skipping $PARTITION"
-            return
-        }
-
-        sort -u "$FILE_CONTEXTS" -o "$FILE_CONTEXTS"
-        sort -u "$FS_CONFIG" -o "$FS_CONFIG"
 
         if [[ "$FILE_SYSTEM" == "erofs" ]]; then
             echo " "
@@ -3016,7 +3021,7 @@ BUILD_IMG() {
                 -z lz4hc \
                 -b 4096 \
                 -T 1199145600 \
-                "$OUT_IMG" "$SOURCE_DIR" >/dev/null 2>&1
+                "$OUT_IMG" "$SOURCE_DIR"
 
         elif [[ "$FILE_SYSTEM" == "ext4" ]]; then
             echo " "
@@ -3155,7 +3160,7 @@ BUILD_SUPER_IMG() {
 
         echo "Adding: $part_name ($size bytes)"
 
-        PARTITIONS+=" --partition ${part_name}:readonly:${size}:main"
+        PARTITIONS+=" --partition ${part_name}:readonly:${size}:qti_dynamic_partitions"
         IMAGES+=" --image ${part_name}=$img"
         TOTAL_SIZE=$((TOTAL_SIZE + size))
         VALID_IMAGES=1
@@ -3168,12 +3173,17 @@ BUILD_SUPER_IMG() {
 
     TOTAL_SIZE=$((TOTAL_SIZE + 4194304))
 
+    local SUPER_DEVICE_SIZE=8891924480
+    local GROUP_SIZE=$((TOTAL_SIZE + 33554432))
+    [ "$GROUP_SIZE" -gt "$SUPER_DEVICE_SIZE" ] && SUPER_DEVICE_SIZE=$((GROUP_SIZE + 4194304))
+
     $lpmake \
-	    --device super:$TOTAL_SIZE \
+        --device super:$SUPER_DEVICE_SIZE \
         --metadata-size 65536 \
         --metadata-slots 2 \
-		--group main:$TOTAL_SIZE \
-		--block-size 4096 \
+        --group qti_dynamic_partitions:$GROUP_SIZE \
+        --group main:$GROUP_SIZE \
+        --block-size 4096 \
         $PARTITIONS \
         $IMAGES \
         --output "$OUTPUT_IMG"
@@ -3248,5 +3258,36 @@ INTEGRATE_CUSTOM_VENDOR() {
     echo "Custom vendor integration complete. Vendor partition will be packed as-is without modifications."
 }
 
+DOWNLOAD_ODM_IMG() {
+    local OUT_DIR="$1"
+    local ODM_URL="$2"
+    local TARGET_IMG="${OUT_DIR}/odm.img"
 
+    mkdir -p "$OUT_DIR"
+
+    if [[ -f "$TARGET_IMG" ]]; then
+        echo "[+] odm.img already exists in $OUT_DIR, skipping download."
+        return 0
+    fi
+
+    echo "[+] Downloading pre-built odm.img to $OUT_DIR..."
+
+    # Download using curl (with fallback to wget if curl isn't available)
+    if command -v curl &>/dev/null; then
+        curl -L -s -o "$TARGET_IMG" "$ODM_URL"
+    elif command -v wget &>/dev/null; then
+        wget -q -O "$TARGET_IMG" "$ODM_URL"
+    else
+        echo "[-] Error: Neither curl nor wget is installed."
+        return 1
+    fi
+
+    if [[ -f "$TARGET_IMG" && -s "$TARGET_IMG" ]]; then
+        echo "[+] Successfully downloaded odm.img ($(du -h "$TARGET_IMG" | cut -f1))"
+    else
+        echo "[-] Error: Failed to download odm.img or downloaded file is empty."
+        rm -f "$TARGET_IMG"
+        return 1
+    fi
+}
 
