@@ -193,7 +193,6 @@ jobs:
           echo "VENDOR_REPO=$VENDOR_R" | tee -a "$GITHUB_ENV"
           echo "PUBLISH_RELEASE=${{ inputs.PUBLISH_RELEASE }}" | tee -a "$GITHUB_ENV"
 
-
           echo "DEBLOAT_ROM=${{ inputs.DEBLOAT_ROM }}" | tee -a "$GITHUB_ENV"
           echo "DEBLOAT_SAMSUNG_BIXBY=${{ inputs.DEBLOAT_SAMSUNG_BIXBY }}" | tee -a "$GITHUB_ENV"
           echo "DEBLOAT_SAMSUNG_DEX=${{ inputs.DEBLOAT_SAMSUNG_DEX }}" | tee -a "$GITHUB_ENV"
@@ -303,6 +302,12 @@ jobs:
             exit 1
           fi
 
+      - name: Download Pre-built ODM Image
+        run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+          mkdir -p OUT
+          curl -L -o OUT/odm.img "https://github.com/USER/REPO/releases/download/TAG/odm.img"
+          DOWNLOAD_ODM_IMG
 
       - name: Decode odm, omc
         run: |
