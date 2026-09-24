@@ -14,15 +14,24 @@ on:
           - SM-A515F
           - SM-N985F
 
+      VENDOR_REPO:
+        description: "Custom Vendor repository (owner/repo)"
+        default: 'https://github.com/Dai-doz/android_vendor_a12snsxx'
+        type: choice
+        options:
+          - https://github.com/Dai-doz/android_vendor_a12snsxx
+          - https://github.com/Dai-doz/android_vendor_a22nsxx
+          -
+
       TARGET_DEVICE:
         description: "TARGET_DEVICE_MODEL."
         required: true
-        default: "SM-S711B"
+        default: "SM-A176B"
 
       TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK:
         description: "Input target device CSC code or direct download link."
         required: true
-        default: "BKD"
+        default: "XXV"
 
       TARGET_FW_VERSION:
         description: "Specific Samsung firmware version (PDA/CSC/MODEM) OR (AP/CSC/CP)"
@@ -37,8 +46,8 @@ on:
           - ext4
           - f2fs
 
-      COMPRESS_IMG_TO_XZ:
-        description: "Compress img to xz"
+      PUBLISH_RELEASE:
+        description: "Publish official release to gofile & update OTA? (True/False) [Developer only]"
         default: 'False'
         type: choice
         options:
@@ -171,6 +180,7 @@ jobs:
         run: |
           echo "FIRM_DIR=$(pwd)/FW" | tee -a "$GITHUB_ENV"
           echo "OUT_DIR=$(pwd)/OUT" | tee -a "$GITHUB_ENV"
+          echo "KERNEL_DIR=$(pwd)/platform/{STOCK_DEVICE}/patches/kernel" | tee -a "$GITHUB_ENV"
           echo "WORK_DIR=$(pwd)/WORK" | tee -a "$GITHUB_ENV"
           echo "DEVICES_DIR=$(pwd)/QuantumROM/Devices" | tee -a "$GITHUB_ENV"
           echo "APKTOOL=$(pwd)/bin/java/apktool.jar" | tee -a "$GITHUB_ENV"
@@ -180,6 +190,9 @@ jobs:
           echo "TARGET_DEVICE=${{ inputs.TARGET_DEVICE }}" | tee -a "$GITHUB_ENV"
           echo "TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK=${{ inputs.TARGET_DEVICE_CSC_OR_DOWNLOAD_LINK }}" | tee -a "$GITHUB_ENV"
           echo "TARGET_FW_VERSION=${{ inputs.TARGET_FW_VERSION }}" | tee -a "$GITHUB_ENV"
+          echo "VENDOR_REPO=$VENDOR_R" | tee -a "$GITHUB_ENV"
+          echo "PUBLISH_RELEASE=${{ inputs.PUBLISH_RELEASE }}" | tee -a "$GITHUB_ENV"
+
 
           echo "DEBLOAT_ROM=${{ inputs.DEBLOAT_ROM }}" | tee -a "$GITHUB_ENV"
           echo "DEBLOAT_SAMSUNG_BIXBY=${{ inputs.DEBLOAT_SAMSUNG_BIXBY }}" | tee -a "$GITHUB_ENV"
@@ -198,6 +211,7 @@ jobs:
 
           echo "OUTPUT_FILESYSTEM=${{ inputs.OUTPUT_FILESYSTEM }}" | tee -a "$GITHUB_ENV"
           echo "COMPRESS_IMG_TO_XZ=${{ inputs.COMPRESS_IMG_TO_XZ }}" | tee -a "$GITHUB_ENV"
+          echo "PUBLISH_RELEASE=${{ inputs.PUBLISH_RELEASE || github.event.client_payload.publish_release || 'False' }}" | tee -a "$GITHUB_ENV"
  
       - name: Validate STOCK_DEVICE - ${{ inputs.STOCK_DEVICE }}
         run: |
@@ -268,6 +282,27 @@ jobs:
         run: |
           source "$(pwd)/scripts/QuantumRom.sh"
           EXTRACT_FIRMWARE_IMG "$FIRM_DIR/$TARGET_DEVICE" "all"
+
+      - name: Switch to custom vendor for ${{ inputs.STOCK_DEVICE }}
+        env:
+          GIT_TOKEN: ${{ secrets.GIT_TOKEN || secrets.GH_TOKEN }}
+        run: |
+          source "$(pwd)/scripts/QuantumRom.sh"
+          echo "Cloning vendor repository: $VENDOR_REPO..."
+          rm -rf /tmp/vendor_src
+          git clone --depth=1 "${VENDOR_REPO}.git" /tmp/vendor_src || {
+            if [ -n "$GIT_TOKEN" ]; then
+              git clone --depth=1 "https://${GIT_TOKEN}@github.com/${VENDOR_REPO}.git" /tmp/vendor_src
+            fi
+          }
+
+          if [ -d /tmp/vendor_src ]; then
+            INTEGRATE_CUSTOM_VENDOR "/tmp/vendor_src" "$FIRM_DIR/$TARGET_DEVICE"
+          else
+            echo "[-] Error: Failed to clone vendor repo $VENDOR_REPO!"
+            exit 1
+          fi
+
 
       - name: Decode odm, omc
         run: |
@@ -411,6 +446,19 @@ jobs:
           7z a -tzip "$ZIP_PATH" "$OUT_DIR"/* -mx=5
           echo "ZIP_PATH=$ZIP_PATH" | tee -a "$GITHUB_ENV"
 
+      - name: Package Recovery Flashable ZIP
+        env:
+          OTA_KEY_BASE64: ${{ secrets.OTA_KEY_BASE64 }}
+        run: |
+          echo "BUILD_TIME=$(TZ='Asia/Dhaka' date '+%Y-%m-%d %I:%M:%S %p UTC+6')" | tee -a "$GITHUB_ENV"
+          DATE_TAG=$(date '+%Y%m%d')
+          ROM_VERSION="3.5.1"
+          ZIP_NAME="ProjectDozG-${ROM_VERSION}-${DATE_TAG}-{STOCK_DEVICE}.zip"
+          bash scripts/make_flashable_zip.sh "$OUT_DIR" "$TARGET_DEVICE" "$STOCK_DEVICE" "$KERNEL_DIR/kernel.zip" "$ZIP_NAME"
+          echo "ZIP_PATH=$OUT_DIR/$ZIP_NAME" | tee -a "$GITHUB_ENV"
+          echo "ZIP_NAME=$ZIP_NAME" | tee -a "$GITHUB_ENV"
+          echo "ROM_VERSION=$ROM_VERSION" | tee -a "$GITHUB_ENV"
+
       - name: Upload file in GoFile & Create Release.
         env:
           GIT_TOKEN: ${{ secrets.GIT_TOKEN }}
@@ -418,6 +466,7 @@ jobs:
           source "$(pwd)/scripts/QuantumRom.sh"
           export ANDROID_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.release")
           ONEUI_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.oneui")
+          PUBLISH_RELEASE: ${{ env.PUBLISH_RELEASE }}
           export ONEUI_VERSION="$((ONEUI_VERSION / 10000)).$(((ONEUI_VERSION / 100) % 100))"
           export BUILD_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.build.version.incremental")
           export SDK_VERSION=$(GET_PROP "$FIRM_DIR/$TARGET_DEVICE" "system" "ro.system.build.version.sdk")

@@ -2711,6 +2711,39 @@ APPLY_CUSTOM_FEATURES() {
 	BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.surface_flinger.protected_contents" "true"
 	BUILD_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.locale" "en-US"
 
+    if [ -d "$(pwd)/OTA/system" ]; then
+        echo -e "Patch FOTA update switch to LOS init "
+        echo -e "Authors: tui2019 / Dai-doz / LineageOS contributors"
+        echo -e "Processing..."
+        echo -e "- Integrating LineageOS OTA Updater and Keystore..."
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/priv-app/Updater"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/priv-app/com.wssyncmldm"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/etc/permissions"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/etc/sysconfig"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/etc/security"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/system/system/etc/init/hw"
+        cp -rfa "$(pwd)/OTA/system/." "${EXTRACTED_FIRM_DIR}/system/system/"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "lineage.updater.uri" "https://raw.githubusercontent.com/lucasznoctyra-lautarokwindows/QuantumROM/QuantumROM-master/platform/{$STOCK_DEVICE}/{$STOCK_DEVICE}.json"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.lineage.device" "{$STOCK_DEVICE}"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.lineage.build.version" "3.5.1"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.lineage.releasetype" "Official"
+
+        echo -e "- Check date and sign into LineageOS OTA Updater..."
+        # Synchronize build date and UTC timestamp for OTA updater and system info
+        local BUILD_UTC="${BUILD_DATETIME_UTC:-$(date +%s)}"
+        local BUILD_DATE="$(date)"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.build.date.utc" "$BUILD_UTC"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.build.date" "$BUILD_DATE"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.build.date.utc" "$BUILD_UTC"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system" "ro.system.build.date" "$BUILD_DATE"
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system_ext" "ro.system_ext.build.date.utc" "$BUILD_UTC" 2>/dev/null || true
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "system_ext" "ro.system_ext.build.date" "$BUILD_DATE" 2>/dev/null || true
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.build.date.utc" "$BUILD_UTC" 2>/dev/null || true
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.product.build.date" "$BUILD_DATE" 2>/dev/null || true
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.build.date.utc" "$BUILD_UTC" 2>/dev/null || true
+        BUILD_PROP "$EXTRACTED_FIRM_DIR" "product" "ro.build.date" "$BUILD_DATE" 2>/dev/null || true
+    fi
+
     # Apply custom floating feature.
 	APPLY_CUSTOM_FLOATING_FEATURE "$EXTRACTED_FIRM_DIR"
 
@@ -3047,6 +3080,16 @@ BUILD_IMG() {
             echo -e "- Unsupported filesystem: $FILE_SYSTEM"
             return
         fi
+
+        if [ "$PARTITION" = "vendor" ] && [ -f "${EXTRACTED_FIRM_DIR}/config/vendor_size.txt" ]; then
+            local PARTITION_MAX_SIZE=$(tr -d '[:space:]' < "${EXTRACTED_FIRM_DIR}/config/vendor_size.txt")
+            local IMG_SIZE=$(stat -c%s "$OUT_IMG" 2>/dev/null || stat -f%z "$OUT_IMG")
+            echo "[+] Built vendor.img: $IMG_SIZE bytes (partition limit: $PARTITION_MAX_SIZE bytes)"
+            if [ -n "$PARTITION_MAX_SIZE" ] && [ "$IMG_SIZE" -gt "$PARTITION_MAX_SIZE" ]; then
+                echo "[-] Error: vendor.img size ($IMG_SIZE bytes) exceeds partition limit ($PARTITION_MAX_SIZE bytes)!"
+                return 1
+            fi
+        fi
     }
 
     if [ "$MODE" = "all" ]; then
@@ -3135,3 +3178,75 @@ BUILD_SUPER_IMG() {
         $IMAGES \
         --output "$OUTPUT_IMG"
 }
+
+INTEGRATE_CUSTOM_VENDOR() {
+    echo " "
+    echo -e "Patch vendor partition"
+    echo -e "Authors: tui2019 / Dai-doz"
+    echo -e "Processing..."
+    if [ "$#" -lt 2 ]; then
+        echo -e "Usage: ${FUNCNAME[0]} <VENDOR_SRC_DIR> <EXTRACTED_FIRM_DIR>"
+        return 1
+    fi
+
+    local VENDOR_SRC_DIR="$1"
+    local EXTRACTED_FIRM_DIR="$2"
+
+    [ ! -d "$VENDOR_SRC_DIR" ] && {
+        echo "- Vendor source dir not found: $VENDOR_SRC_DIR"
+        return 0
+    }
+
+    echo "=============================================="
+    echo "   Integrating Custom Vendor ($STOCK_DEVICE) "
+    echo "=============================================="
+
+    rm -rf "${EXTRACTED_FIRM_DIR}/vendor"
+    mkdir -p "${EXTRACTED_FIRM_DIR}/vendor"
+
+    if [ -d "$VENDOR_SRC_DIR/vendor" ]; then
+        echo "[+] Copying vendor directory contents from $VENDOR_SRC_DIR/vendor..."
+        cp -a "$VENDOR_SRC_DIR/vendor/." "${EXTRACTED_FIRM_DIR}/vendor/"
+    else
+        echo "[+] Copying vendor root contents..."
+        cp -a "$VENDOR_SRC_DIR/." "${EXTRACTED_FIRM_DIR}/vendor/"
+    fi
+
+    # Handle vendor config if present in vendor repo
+    if [ -d "$VENDOR_SRC_DIR/config" ]; then
+        echo "[+] Using vendor config from repository..."
+        mkdir -p "${EXTRACTED_FIRM_DIR}/config"
+        [ -f "$VENDOR_SRC_DIR/config/vendor_fs_config" ] && cp -f "$VENDOR_SRC_DIR/config/vendor_fs_config" "${EXTRACTED_FIRM_DIR}/config/vendor_fs_config"
+        [ -f "$VENDOR_SRC_DIR/config/vendor_file_contexts" ] && cp -f "$VENDOR_SRC_DIR/config/vendor_file_contexts" "${EXTRACTED_FIRM_DIR}/config/vendor_file_contexts"
+        [ -f "$VENDOR_SRC_DIR/config/vendor_size.txt" ] && cp -f "$VENDOR_SRC_DIR/config/vendor_size.txt" "${EXTRACTED_FIRM_DIR}/config/vendor_size.txt"
+        [ -f "$VENDOR_SRC_DIR/config/odm_fs_config" ] && cp -f "$VENDOR_SRC_DIR/config/odm_fs_config" "${EXTRACTED_FIRM_DIR}/config/odm_fs_config"
+        [ -f "$VENDOR_SRC_DIR/config/odm_file_contexts" ] && cp -f "$VENDOR_SRC_DIR/config/odm_file_contexts" "${EXTRACTED_FIRM_DIR}/config/odm_file_contexts"
+    else
+        # Clear old Exynos vendor config so it gets generated cleanly
+        rm -f "${EXTRACTED_FIRM_DIR}/config/vendor_fs_config" "${EXTRACTED_FIRM_DIR}/config/vendor_file_contexts"
+    fi
+
+    # Clean non-vendor artifacts if copied from root
+    rm -rf "${EXTRACTED_FIRM_DIR}/vendor/config"
+    rm -rf "${EXTRACTED_FIRM_DIR}/vendor/.git" "${EXTRACTED_FIRM_DIR}/vendor/.github"
+
+    if [ -d "$VENDOR_SRC_DIR/odm" ]; then
+        echo "[+] Copying custom ODM..."
+        rm -rf "${EXTRACTED_FIRM_DIR}/odm"
+        mkdir -p "${EXTRACTED_FIRM_DIR}/odm"
+        cp -a "$VENDOR_SRC_DIR/odm/." "${EXTRACTED_FIRM_DIR}/odm/"
+        rm -rf "${EXTRACTED_FIRM_DIR}/odm/.git" "${EXTRACTED_FIRM_DIR}/odm/.github" "${EXTRACTED_FIRM_DIR}/odm/config"
+    fi
+
+    # Ensure minimal odm exists for dynamic partition early mount
+    if [ ! -d "${EXTRACTED_FIRM_DIR}/odm" ]; then
+        mkdir -p "${EXTRACTED_FIRM_DIR}/odm/etc"
+        echo "ro.odm.build.version.release=16" > "${EXTRACTED_FIRM_DIR}/odm/etc/build.prop"
+    fi
+
+    export CUSTOM_VENDOR_INTEGRATED=1
+    echo "Custom vendor integration complete. Vendor partition will be packed as-is without modifications."
+}
+
+
+
