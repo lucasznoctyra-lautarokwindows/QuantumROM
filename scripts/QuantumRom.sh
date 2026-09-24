@@ -3102,14 +3102,16 @@ BUILD_IMG() {
         fi
     }
 
-    if [ "$MODE" = "all" ]; then
+        if [ "$MODE" = "all" ]; then
 
         for PART in "$EXTRACTED_FIRM_DIR"/*; do
             [[ -d "$PART" ]] || continue
 
             local PARTITION="$(basename "$PART")"
 
+            # Bỏ qua folder config và không build lại phân vùng odm
             [[ "$PARTITION" == "config" ]] && continue
+            [[ "$PARTITION" == "odm" ]] && echo "[-] Skipped building odm.img (using existing image in OUT)" && continue
 
             build_img "$PARTITION"
         done
