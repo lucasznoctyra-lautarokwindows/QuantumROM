@@ -180,7 +180,7 @@ jobs:
         run: |
           echo "FIRM_DIR=$(pwd)/FW" | tee -a "$GITHUB_ENV"
           echo "OUT_DIR=$(pwd)/OUT" | tee -a "$GITHUB_ENV"
-          echo "KERNEL_DIR=$(pwd)/platform/$STOCK_DEVICE/patches/kernel" | tee -a "$GITHUB_ENV"
+          echo "KERNEL_DIR=$(pwd)/platform/${STOCK_DEVICE}/patches/kernel" | tee -a "$GITHUB_ENV"
           echo "WORK_DIR=$(pwd)/WORK" | tee -a "$GITHUB_ENV"
           echo "DEVICES_DIR=$(pwd)/QuantumROM/Devices" | tee -a "$GITHUB_ENV"
           echo "APKTOOL=$(pwd)/bin/java/apktool.jar" | tee -a "$GITHUB_ENV"

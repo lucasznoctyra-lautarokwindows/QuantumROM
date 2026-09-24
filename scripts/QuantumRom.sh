@@ -577,6 +577,11 @@ EXTRACT_FIRMWARE_IMG() {
             extract_img "$imgfile"
         done
 
+    if [ -f "${EXTRACTED_FIRM_DIR}/odm.img" ] && [ ! -d "${EXTRACTED_FIRM_DIR}/odm" ]; then
+            echo -e "[!] Force extracting odm.img..."
+            extract_img "${EXTRACTED_FIRM_DIR}/odm.img"
+        fi
+
 	    if [ "${GITHUB_ACTIONS}" = "true" ]; then
             rm -f "$EXTRACTED_FIRM_DIR"/*.img
         fi
