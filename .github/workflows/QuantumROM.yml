@@ -21,7 +21,7 @@ on:
         options:
           - https://github.com/Dai-doz/android_vendor_a12snsxx
           - https://github.com/Dai-doz/android_vendor_a22nsxx
-          -
+          - None
 
       TARGET_DEVICE:
         description: "TARGET_DEVICE_MODEL."
@@ -301,13 +301,6 @@ jobs:
             echo "[-] Error: Failed to clone vendor repo $VENDOR_REPO!"
             exit 1
           fi
-
-      - name: Download Pre-built ODM Image
-        run: |
-          source "$(pwd)/scripts/QuantumRom.sh"
-          mkdir -p OUT
-          curl -L -o OUT/odm.img "https://github.com/USER/REPO/releases/download/TAG/odm.img"
-          DOWNLOAD_ODM_IMG
 
       - name: Decode odm, omc
         run: |

@@ -2979,41 +2979,36 @@ BUILD_IMG() {
 
     build_img() {
         local PARTITION="$1"
+
+        mkdir -p "${EXTRACTED_FIRM_DIR}/${PARTITION}/lost+found"
+
+        GEN_FS_CONFIG "$EXTRACTED_FIRM_DIR" "$PARTITION"
+        GEN_FILE_CONTEXTS "$EXTRACTED_FIRM_DIR" "$PARTITION"
+
         local SOURCE_DIR="${EXTRACTED_FIRM_DIR}/$PARTITION"
         local OUT_IMG="$OUT_DIR/${PARTITION}.img"
         local FS_CONFIG="${EXTRACTED_FIRM_DIR}/config/${PARTITION}_fs_config"
         local FILE_CONTEXTS="${EXTRACTED_FIRM_DIR}/config/${PARTITION}_file_contexts"
-        local MOUNT_POINT="/$PARTITION"
 
         [[ -d "$SOURCE_DIR" ]] || return
 
-        if [ "$PARTITION" = "vendor" ] && [ -f "$FS_CONFIG" ] && [ -f "$FILE_CONTEXTS" ]; then
-            echo "=============================================="
-            echo " Packing vendor directly as-is (no modifying) "
-            echo "=============================================="
-        else
-            mkdir -p "${EXTRACTED_FIRM_DIR}/${PARTITION}/lost+found"
-
-            GEN_FS_CONFIG "$EXTRACTED_FIRM_DIR" "$PARTITION"
-            GEN_FILE_CONTEXTS "$EXTRACTED_FIRM_DIR" "$PARTITION"
-
-            [[ -f "$FS_CONFIG" ]] || {
-                echo -e "Warning: $FS_CONFIG missing, skipping $PARTITION"
-                return
-            }
-
-            [[ -f "$FILE_CONTEXTS" ]] || {
-                echo -e "Warning: $FILE_CONTEXTS missing, skipping $PARTITION"
-                return
-            }
-
-            sort -u "$FILE_CONTEXTS" -o "$FILE_CONTEXTS"
-            sort -u "$FS_CONFIG" -o "$FS_CONFIG"
-        fi
-
         local EXTRACTED_SIZE=$(du -sb --apparent-size "$SOURCE_DIR" | cut -f1)
+        local MOUNT_POINT="/$PARTITION"
 
         rm -rf "$OUT_IMG"
+
+        [[ -f "$FS_CONFIG" ]] || {
+            echo -e "Warning: $FS_CONFIG missing, skipping $PARTITION"
+            return
+        }
+
+        [[ -f "$FILE_CONTEXTS" ]] || {
+            echo -e "Warning: $FILE_CONTEXTS missing, skipping $PARTITION"
+            return
+        }
+
+        sort -u "$FILE_CONTEXTS" -o "$FILE_CONTEXTS"
+        sort -u "$FS_CONFIG" -o "$FS_CONFIG"
 
         if [[ "$FILE_SYSTEM" == "erofs" ]]; then
             echo " "
@@ -3026,7 +3021,7 @@ BUILD_IMG() {
                 -z lz4hc \
                 -b 4096 \
                 -T 1199145600 \
-                "$OUT_IMG" "$SOURCE_DIR"
+                "$OUT_IMG" "$SOURCE_DIR" >/dev/null 2>&1
 
         elif [[ "$FILE_SYSTEM" == "ext4" ]]; then
             echo " "
@@ -3090,16 +3085,6 @@ BUILD_IMG() {
             echo -e "- Unsupported filesystem: $FILE_SYSTEM"
             return
         fi
-
-        if [ "$PARTITION" = "vendor" ] && [ -f "${EXTRACTED_FIRM_DIR}/config/vendor_size.txt" ]; then
-            local PARTITION_MAX_SIZE=$(tr -d '[:space:]' < "${EXTRACTED_FIRM_DIR}/config/vendor_size.txt")
-            local IMG_SIZE=$(stat -c%s "$OUT_IMG" 2>/dev/null || stat -f%z "$OUT_IMG")
-            echo "[+] Built vendor.img: $IMG_SIZE bytes (partition limit: $PARTITION_MAX_SIZE bytes)"
-            if [ -n "$PARTITION_MAX_SIZE" ] && [ "$IMG_SIZE" -gt "$PARTITION_MAX_SIZE" ]; then
-                echo "[-] Error: vendor.img size ($IMG_SIZE bytes) exceeds partition limit ($PARTITION_MAX_SIZE bytes)!"
-                return 1
-            fi
-        fi
     }
 
     if [ "$MODE" = "all" ]; then
@@ -3110,11 +3095,6 @@ BUILD_IMG() {
             local PARTITION="$(basename "$PART")"
 
             [[ "$PARTITION" == "config" ]] && continue
-
-    if [[ "$PARTITION" == "odm" && -f "$OUT_DIR/odm.img" ]]; then
-            echo "[+] Found ODM in OUT , skipping build odm"
-            continue
-    fi
 
             build_img "$PARTITION"
         done
@@ -3184,7 +3164,7 @@ BUILD_SUPER_IMG() {
     TOTAL_SIZE=$((TOTAL_SIZE + 4194304))
 
     $lpmake \
-        --device super:$TOTAL_SIZE \
+	    --device super:$TOTAL_SIZE \
         --metadata-size 65536 \
         --metadata-slots 2 \
 		--group main:$TOTAL_SIZE \
@@ -3261,38 +3241,5 @@ INTEGRATE_CUSTOM_VENDOR() {
 
     export CUSTOM_VENDOR_INTEGRATED=1
     echo "Custom vendor integration complete. Vendor partition will be packed as-is without modifications."
-}
-
-DOWNLOAD_ODM_IMG() {
-    local OUT_DIR="$1"
-    local ODM_URL="$2"
-    local TARGET_IMG="${OUT_DIR}/odm.img"
-
-    mkdir -p "$OUT_DIR"
-
-    if [[ -f "$TARGET_IMG" ]]; then
-        echo "[+] odm.img already exists in $OUT_DIR, skipping download."
-        return 0
-    fi
-
-    echo "[+] Downloading pre-built odm.img to $OUT_DIR..."
-
-    # Download using curl (with fallback to wget if curl isn't available)
-    if command -v curl &>/dev/null; then
-        curl -L -s -o "$TARGET_IMG" "$ODM_URL"
-    elif command -v wget &>/dev/null; then
-        wget -q -O "$TARGET_IMG" "$ODM_URL"
-    else
-        echo "[-] Error: Neither curl nor wget is installed."
-        return 1
-    fi
-
-    if [[ -f "$TARGET_IMG" && -s "$TARGET_IMG" ]]; then
-        echo "[+] Successfully downloaded odm.img ($(du -h "$TARGET_IMG" | cut -f1))"
-    else
-        echo "[-] Error: Failed to download odm.img or downloaded file is empty."
-        rm -f "$TARGET_IMG"
-        return 1
-    fi
 }
 
