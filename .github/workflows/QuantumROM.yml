@@ -123,28 +123,6 @@ jobs:
           echo "OUTPUT_FILESYSTEM=${{ inputs.OUTPUT_FILESYSTEM }}" | tee -a "$GITHUB_ENV"
           echo "COMPRESS_IMG=${{ inputs.COMPRESS_IMG }}" | tee -a "$GITHUB_ENV"
 
-      - name: Validate STOCK_DEVICE - ${{ inputs.STOCK_DEVICE }}
-        run: |
-          REPO="SN-Abdullah-Al-Noman/QuantumROM"
-          BRANCH="Devices"
-
-          source "$(pwd)/scripts/git_utils.sh"
-
-          if [ "$STOCK_DEVICE" != "None" ]; then
-              if ! curl -fsSL -H "Accept: application/vnd.github+json" \
-                  "https://api.github.com/repos/$REPO/contents/$STOCK_DEVICE?ref=$BRANCH" >/dev/null; then
-
-                echo "❌ Unsupported: Device '$STOCK_DEVICE' not found in $REPO/$BRANCH"
-                exit 1
-              fi
-
-              echo "✅ Device supported: $STOCK_DEVICE"
-              GIT_SPARSE_DOWNLOAD "SN-Abdullah-Al-Noman/QuantumROM" "Devices" "$STOCK_DEVICE" \
-                  "$(pwd)/QuantumROM/Devices/$STOCK_DEVICE"
-          else
-              echo "ℹ️ STOCK_DEVICE is set to None."
-          fi
-
       - name: Check disk space
         id: disk
         run: |
